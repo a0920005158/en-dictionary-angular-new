@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AjaxServiceService } from './ajax-service.service';
+import { AjaxService } from './ajax.service';
 import { WordSearch, WordDefinition, WordExamples } from '../struct/WordSearch';
 import { Observable, forkJoin, interval, throwError, Subject } from 'rxjs';
 import { map, take } from 'rxjs/operators';
@@ -11,7 +11,7 @@ export class WordService {
   private url: string = "https://api.wordnik.com/v4/word.json/";
   private Wordnik_API_Key: string = "nxf8br2c6444ehxws2yz63o7tv2l6hiptwa1rjs6wonhizkqg";
 
-  constructor(private ajax: AjaxServiceService) { }
+  constructor(private ajax: AjaxService) { }
 
   searchWord(word: string) {
     return forkJoin([this.searchDefinitions(word), this.searchExample(word)]).pipe(

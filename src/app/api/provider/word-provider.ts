@@ -1,5 +1,5 @@
 import { Injector } from '@angular/core';
-import { AjaxServiceService } from 'src/app/service/ajax-service.service';
+import { AjaxService } from 'src/app/service/ajax.service';
 import { WordSearch } from 'src/app/struct/WordSearch';
 import { BaseProvider } from './base-provider';
 
@@ -7,14 +7,13 @@ export class WordProvider extends BaseProvider {
   private url: string = "https://api.wordnik.com/v4/word.json/";
   private Wordnik_API_Key: string = "nxf8br2c6444ehxws2yz63o7tv2l6hiptwa1rjs6wonhizkqg";
 
-  ajax!: AjaxServiceService;
+  ajax!: AjaxService;
   constructor() {
     super();
-    this.ajax = this.InjectorService(AjaxServiceService);
+    this.ajax = this.InjectorService(AjaxService);
   }
 
   static injector: Injector;
-  // ajax: AjaxServiceService = WordProvider.injector.get(AjaxServiceService)
 
   searchDefinitions(word: string) {
     let url = this.url + word + "/definitions";

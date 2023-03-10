@@ -1,8 +1,16 @@
 import { HttpParams } from "@angular/common/http";
+import { Observable } from "rxjs";
+import { ApiCallService } from "src/app/service/api-call.service";
 
 export abstract class API_Base {
+  abstract call(data: unknown);
   protected abstract url: string;
   protected data!: any;
+  ApiCallService: ApiCallService
+
+  constructor(ApiCallService: ApiCallService) {
+    this.ApiCallService = ApiCallService;
+  }
 
   public getApiPath() {
     return this.url;
@@ -16,4 +24,8 @@ export abstract class API_Base {
 
     return body;
   }
+
+  public subscribe<T>(): Observable<T> {
+    return this.ApiCallService.ajaxService.apiCall(this);
+  };
 }

@@ -6,7 +6,7 @@ import { API_Base } from '../api/structure/API_Base';
 @Injectable({
   providedIn: 'root'
 })
-export class AjaxServiceService {
+export class AjaxService {
   httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/x-www-form-urlencoded'
@@ -40,11 +40,14 @@ export class AjaxServiceService {
     });
   }
 
-  apiCall(api: API_Base) {
+  apiCall<T>(api: API_Base): Observable<T> {
     let apiPath = this.config.apiPath
     return new Observable(observer => {
       this.httpClient.post<any>(apiPath + api.getApiPath(), api.getParameter(), this.httpOptions).subscribe(res => {
         observer.next(res);
+      },
+      error=>{
+        observer.error(error);
       });
     });
   }

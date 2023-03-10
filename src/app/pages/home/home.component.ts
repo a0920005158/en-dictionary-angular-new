@@ -52,7 +52,7 @@ export class HomeComponent implements OnInit {
 
   startRecognition() {
     if (this.status == "開始辨識") {
-      this.status = "顯示語音辨識結果";
+      this.status = "顯示辨識結果";
       this.speechRecognitionService.start().subscribe(
         (text) => {
           console.log('============');
