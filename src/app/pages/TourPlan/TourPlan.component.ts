@@ -1,4 +1,4 @@
-import { PlacesService } from './../../service/places.service';
+import { PlacesService } from '../../service/places.service';
 import { Component, OnInit } from '@angular/core';
 import noUiSlider from "nouislider";
 import { SpeechRecognitionService } from 'src/app/service/speech-recognition.service';
@@ -9,11 +9,11 @@ import { WordSearch } from 'src/app/struct/WordSearch';
 import { AIConversation } from '../../struct/AIConversation';
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  selector: 'tour-plan',
+  templateUrl: './tourPlan.component.html',
+  styleUrls: ['./tourPlan.component.scss']
 })
-export class HomeComponent implements OnInit {
+export class TourPlanComponent implements OnInit {
   selfRole = ChatRole.自己;
   robotRole = ChatRole.機器人;
   recognitionText: string = "";

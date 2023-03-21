@@ -22,7 +22,7 @@ import { ProfilepageComponent } from "./examples/profilepage/profilepage.compone
 import { RegisterpageComponent } from "./examples/registerpage/registerpage.component";
 import { LandingpageComponent } from "./examples/landingpage/landingpage.component";
 import { HomeComponent } from './home/home.component';
-
+import { TourPlanComponent } from "./TourPlan/TourPlan.component";
 @NgModule({
   imports: [
     CommonModule,
@@ -47,14 +47,16 @@ import { HomeComponent } from './home/home.component';
     ProfilepageComponent,
     RegisterpageComponent,
     LandingpageComponent,
-    HomeComponent
+    HomeComponent,
+    TourPlanComponent
   ],
   exports: [
     IndexComponent,
     ProfilepageComponent,
     RegisterpageComponent,
-    LandingpageComponent
+    LandingpageComponent,
+    HomeComponent
   ],
   providers: []
 })
-export class PagesModule {}
+export class PagesModule { }

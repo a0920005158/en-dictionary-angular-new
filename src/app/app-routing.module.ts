@@ -1,3 +1,4 @@
+import { TourPlanComponent } from './pages/TourPlan/TourPlan.component';
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { BrowserModule } from "@angular/platform-browser";
@@ -13,6 +14,7 @@ import { HomeComponent } from "./pages/home/home.component";
 const routes: Routes = [
   { path: "", redirectTo: "home", pathMatch: "full" },
   { path: "home", component: HomeComponent },
+  { path: "tour-plan", component: TourPlanComponent },
   // { path: "home", component: IndexComponent },
   { path: "profile", component: ProfilepageComponent },
   { path: "register", component: RegisterpageComponent },

@@ -27,27 +27,35 @@ import { LandingpageComponent } from "./pages/examples/landingpage/landingpage.c
 import { ConfigService } from "./service/config.service";
 import { SocialLoginModule, SocialAuthServiceConfig } from '@abacritt/angularx-social-login';
 import { GoogleLoginProvider, FacebookLoginProvider } from '@abacritt/angularx-social-login';
+// import { AgmCoreModule } from '@agm/core';
+
+// import { HomeComponent } from "./pages/home/home.component";
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    // HomeComponent,
     // IndexComponent,
     // ProfilepageComponent,
     // RegisterpageComponent,
     // LandingpageComponent
   ],
   imports: [
+    // AgmCoreModule.forRoot({
+    //   apiKey: 'AIzaSyDjD2_-EGRNJ7xsioVE60TaGjiYhL3Zx88'
+    // }),
     BrowserAnimationsModule,
     FormsModule,
     HttpClientModule,
     RouterModule,
     AppRoutingModule,
     SocialLoginModule,
+    PagesModule
     // BsDropdownModule.forRoot(),
     // ProgressbarModule.forRoot(),
     // TooltipModule.forRoot(),
     // CollapseModule.forRoot(),
     // TabsModule.forRoot(),
-    PagesModule
+    
     // PaginationModule.forRoot(),
     // AlertModule.forRoot(),
     // BsDatepickerModule.forRoot(),

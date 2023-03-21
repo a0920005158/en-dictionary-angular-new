@@ -11,5 +11,6 @@
             "url": "http://localhost:4200",
             "webRoot": "${workspaceFolder}"
         }
-    ]
+    ],
+    "debug.focusWindowOnBreak": false
 }
