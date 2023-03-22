@@ -13,17 +13,21 @@ export class PlacesService {
 
     constructor(private ajax: AjaxService) {
         this.ajax.get("assets/json/City.json").subscribe((res: { [key: string]: string }) => {
-            console.log('ssss');
-            console.log(res);
             Object.keys(res).forEach(el => {
-                this.cityState.push({
-                    enName: el,
-                    cnName: res[el],
-                    State: []
-                });
+
                 this.ajax.get("assets/json/" + el.replace(/\s+/g, "") + ".json").subscribe((res2: { [key: string]: string }) => {
                     console.log('yyy');
                     console.log(res2);
+                    let state = [];
+                    Object.keys(res2).forEach(el2 => {
+                        
+                    })
+                    this.cityState.push({
+                            enName: el,
+                            cnName: res[el],
+                            State: []
+                    });
+
                 })
             })
         })
