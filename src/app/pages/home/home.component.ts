@@ -102,9 +102,4 @@ export class HomeComponent implements OnInit {
       this.WordSearchResult = el;
     });
   }
-
-
-  searchAttractions(word: string) {
-    this.placesService.searchLocalPlaces(word, PlaceType.全部);
-  }
 }

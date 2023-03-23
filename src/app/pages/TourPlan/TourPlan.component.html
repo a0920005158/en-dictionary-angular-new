@@ -69,12 +69,6 @@
                         </a>
                     </div>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link btn btn-default d-none d-lg-block" href="javascript:void(0)"
-                        (click)="scrollToDownload(target)">
-                        <i class="tim-icons icon-cloud-download-93"> </i> Download
-                    </a>
-                </li>
             </ul>
         </div>
     </div>
@@ -91,41 +85,56 @@
 
         <div class="container">
             <div class="content-center">
+                <div class="form-row" *ngFor="let item of this.searchCityState;index as ii">
+                    <div class="form-group col-md-4">
+                        <label [for]="'inputCity'+ii">城市/{{item.selectCity}}</label>
+                        <select [id]="'inputCity'+ii" class="form-control" [(ngModel)]="item.selectCity">
+                            <option value="-1">隨機</option>
+                            <option *ngFor="let citem of this.cityState;index as i" [value]="i">{{citem.cnName}}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label [for]="'inputState'+ii">鄉鎮/{{item.selectSate}}</label>
+                        <select [id]="'inputState'+ii" class="form-control" [(ngModel)]="item.selectSate">
+                            <option value="-1">隨機</option>
+                            <ng-container *ngIf="item.selectCity!=-1">
+                                <option *ngFor="let sitem of this.cityState[item.selectCity].State;index as j"
+                                    [value]="j">
+                                    {{sitem.cnName}}
+                                </option>
+                            </ng-container>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="inputZip">Zip</label>
+                        <input type="text" class="form-control" id="inputZip">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="inputTime">旅遊期間</label>
+                        <input [(ngModel)]="dateRange" id="inputTime" type="text" placeholder="Daterangepicker"
+                            class="form-control" bsDaterangepicker
+                            [bsConfig]="{ isAnimated: true, containerClass: 'theme-red' }">
+                    </div>
+                </div>
 
-                <form>
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
-                            <label for="inputCity">City</label>
-                            <select id="inputCity" class="form-control">
-                                <option selected>Choose...</option>
-                                <option>...</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="inputState">State</label>
-                            <select id="inputState" class="form-control">
-                                <option selected>Choose...</option>
-                                <option>...</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-2">
-                            <label for="inputZip">Zip</label>
-                            <input type="text" class="form-control" id="inputZip">
-                        </div>
+                <button (click)="addCityState()" type="submit" class="btn btn-primary">添加縣市、鄉鎮</button>
+
+                <button (click)="searchLocalPlaces()" type="submit" class="btn btn-primary">搜尋地名</button>
+
+                <div class="form-group">
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input class="form-check-input" type="checkbox" value="">
+                            Check me out
+                            <span class="form-check-sign">
+                                <span class="check"></span>
+                            </span>
+                        </label>
                     </div>
-                    <div class="form-group">
-                        <div class="form-check">
-                            <label class="form-check-label">
-                                <input class="form-check-input" type="checkbox" value="">
-                                Check me out
-                                <span class="form-check-sign">
-                                    <span class="check"></span>
-                                </span>
-                            </label>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Sign in</button>
-                </form>
+                </div>
 
             </div>
         </div>

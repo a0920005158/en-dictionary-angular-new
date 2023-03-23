@@ -16,6 +16,13 @@ export class ConfigService {
     return this._config.hostUrl + this.apiPrefix;
   }
 
+  get placesUrl() {
+    if (!this._config) {
+      throw Error('Config file not loaded!');
+    }
+    return this._config.placesUrl;
+  }
+
   constructor(private http: HttpClient) { }
 
   loadAppConfig() {

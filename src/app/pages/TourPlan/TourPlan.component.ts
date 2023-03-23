@@ -7,11 +7,12 @@ import { WordService } from 'src/app/service/word.service';
 import { SocialUser } from '@abacritt/angularx-social-login';
 import { WordSearch } from 'src/app/struct/WordSearch';
 import { AIConversation } from '../../struct/AIConversation';
+import { CityState, SearchCityState } from 'src/app/struct/CityState';
 
 @Component({
   selector: 'tour-plan',
-  templateUrl: './tourPlan.component.html',
-  styleUrls: ['./tourPlan.component.scss']
+  templateUrl: './TourPlan.component.html',
+  styleUrls: ['./TourPlan.component.scss']
 })
 export class TourPlanComponent implements OnInit {
   selfRole = ChatRole.自己;
@@ -103,8 +104,27 @@ export class TourPlanComponent implements OnInit {
     });
   }
 
+  get cityState(): CityState[] {
+    return this.placesService.cityState;
+  }
 
-  searchAttractions(word: string) {
-    this.placesService.searchLocalPlaces(word, PlaceType.全部);
+  get searchCityState(): SearchCityState[] {
+    return this.placesService.searchCityState;
+  }
+
+  addCityState() {
+    this.placesService.searchCityState.push(new SearchCityState);
+  }
+
+  searchLocalPlaces() {
+    this.placesService.searchSelectLocalPlaces();
+  }
+
+  get dateRange(): Date[] {
+    return this.placesService.dateRange;
+  }
+
+  set dateRange(val: Date[]) {
+    this.placesService.dateRange = val;
   }
 }

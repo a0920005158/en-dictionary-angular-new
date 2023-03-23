@@ -27,7 +27,7 @@ import { LandingpageComponent } from "./pages/examples/landingpage/landingpage.c
 import { ConfigService } from "./service/config.service";
 import { SocialLoginModule, SocialAuthServiceConfig } from '@abacritt/angularx-social-login';
 import { GoogleLoginProvider, FacebookLoginProvider } from '@abacritt/angularx-social-login';
-// import { AgmCoreModule } from '@agm/core';
+import { AgmCoreModule } from '@agm/core';
 
 // import { HomeComponent } from "./pages/home/home.component";
 @NgModule({
@@ -40,9 +40,9 @@ import { GoogleLoginProvider, FacebookLoginProvider } from '@abacritt/angularx-s
     // LandingpageComponent
   ],
   imports: [
-    // AgmCoreModule.forRoot({
-    //   apiKey: 'AIzaSyDjD2_-EGRNJ7xsioVE60TaGjiYhL3Zx88'
-    // }),
+    AgmCoreModule.forRoot({
+      apiKey: 'AIzaSyDjD2_-EGRNJ7xsioVE60TaGjiYhL3Zx88'
+    }),
     BrowserAnimationsModule,
     FormsModule,
     HttpClientModule,

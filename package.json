@@ -65,6 +65,7 @@
   "private": false,
   "dependencies": {
     "@abacritt/angularx-social-login": "^1.2.4-ngx12.0",
+    "@agm/core": "^3.0.0-beta.0",
     "@angular/animations": "13.3.12",
     "@angular/common": "13.3.12",
     "@angular/compiler": "13.3.12",
