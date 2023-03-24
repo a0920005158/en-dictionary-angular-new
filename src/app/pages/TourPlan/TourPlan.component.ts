@@ -7,7 +7,7 @@ import { WordService } from 'src/app/service/word.service';
 import { SocialUser } from '@abacritt/angularx-social-login';
 import { WordSearch } from 'src/app/struct/WordSearch';
 import { AIConversation } from '../../struct/AIConversation';
-import { CityState, SearchCityState } from 'src/app/struct/CityState';
+import { CityState, Place, SearchCityState } from 'src/app/struct/CityState';
 
 @Component({
   selector: 'tour-plan',
@@ -126,5 +126,9 @@ export class TourPlanComponent implements OnInit {
 
   set dateRange(val: Date[]) {
     this.placesService.dateRange = val;
+  }
+
+  get attractionsInf(): Place {
+    return this.placesService.attractionsInf;
   }
 }

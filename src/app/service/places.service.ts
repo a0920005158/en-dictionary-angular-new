@@ -6,7 +6,7 @@ import { LibRandom } from '../lib/lib-random';
 import { ConfigService } from './config.service';
 import { map } from 'rxjs/operators';
 import { ApiCallService } from './api-call.service';
-import { API_Response } from '../api/structure/API_AIConversation';
+import { API_Response } from '../api/structure/API_AITravelPlan';
 
 @Injectable({
     providedIn: 'root'
@@ -95,7 +95,6 @@ export class PlacesService {
             let attractions = "";
             let hotel = "";
             let food = "";
-            let test = this.dateRange;
             let sd = this.dateRange[0].getFullYear() + "年" + (this.dateRange[0].getMonth() + 1) + "月" + this.dateRange[0].getDate() + "日";
             let ed = this.dateRange[1].getFullYear() + "年" + (this.dateRange[1].getMonth() + 1) + "月" + this.dateRange[1].getDate() + "日";
             let time = sd + "~" + ed;
@@ -108,49 +107,27 @@ export class PlacesService {
                     this.searchLocalPlaces(searchPos, "美食", PlaceType.全部)
                 ]
             ).subscribe(el => {
+                const diffTime = Math.abs(this.dateRange[0].getTime() - this.dateRange[1].getTime()); // 取得相差的毫秒數
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // 將毫秒數轉換為天數
+
                 console.log("================================");
                 console.log(el);
                 this.attractionsInf = el[0];
-                attractions = el[0].map(x => x.name).join("、");
+                // attractions = el[0].map(x => x.name).join("、");
+                attractions = LibRandom.selectRandomItemsFromArray(el[0].map(x => x.name), 3 * diffDays, 5 * diffDays).join("、");
 
                 this.hotelInf = el[1];
-                hotel = el[1].map(x => x.name).join("、");
+                // hotel = el[1].map(x => x.name).join("、");
+                hotel = LibRandom.selectRandomItemsFromArray(el[1].map(x => x.name), 1 * diffDays, 3 * diffDays).join("、");
 
                 this.foodInf = el[2];
-                food = el[2].map(x => x.name).join("、");
-                
+                // food = el[2].map(x => x.name).join("、");
+                food = LibRandom.selectRandomItemsFromArray(el[2].map(x => x.name), 3 * diffDays, 5 * diffDays).join("、S");
+
                 if (attractions != "" && hotel != "" && food != "" && time != "") {
                     this.travelPlan(attractions, hotel, food, time)
                 }
             });
-
-            return;
-
-            this.searchLocalPlaces(searchPos, "景點", PlaceType.全部).subscribe(el => {
-                console.log("================景點================");
-                console.log(el);
-                this.attractionsInf = el;
-                attractions = el.map(x => x.name).join("、");
-                console.log(attractions);
-            });
-
-            this.searchLocalPlaces(searchPos, "旅店", PlaceType.全部).subscribe(el => {
-                console.log("================旅店================");
-                console.log(el);
-                this.hotelInf = el;
-                hotel = el.map(x => x.name).join("、");
-                console.log(hotel);
-            });
-
-            this.searchLocalPlaces(searchPos, "美食", PlaceType.全部).subscribe(el => {
-                console.log("================美食================");
-                console.log(el);
-                this.foodInf = el;
-                food = el.map(x => x.name).join("、");
-                console.log(food);
-            });
-
-
         })
     }
 
@@ -169,7 +146,7 @@ export class PlacesService {
                 } else {
                     let result = "";
                     if (res.choices.length > 0)
-                        result = res.choices[0].message.content;
+                        result = res.choices[0].text;
                 }
 
             },

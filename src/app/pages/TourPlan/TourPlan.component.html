@@ -111,6 +111,19 @@
                         <input type="text" class="form-control" id="inputZip">
                     </div>
                 </div>
+
+                <!-- <div class="form-row">
+                    <div class="form-group col-md-10">
+                        <label for="inputTime">挑選景點</label>
+                        <div *ngFor="let aitem of attractionsInf;index as ai" class="form-check form-check-inline">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1"> {{aitem.name}}
+                                <span class="form-check-sign"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div> -->
+
                 <div class="form-row">
                     <div class="form-group col-md-4">
                         <label for="inputTime">旅遊期間</label>
@@ -120,7 +133,7 @@
                     </div>
                 </div>
 
-                <button (click)="addCityState()" type="submit" class="btn btn-primary">添加縣市、鄉鎮</button>
+                <!-- <button (click)="addCityState()" type="submit" class="btn btn-primary">添加縣市、鄉鎮</button> -->
 
                 <button (click)="searchLocalPlaces()" type="submit" class="btn btn-primary">搜尋地名</button>
 

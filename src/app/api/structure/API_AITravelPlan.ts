@@ -56,8 +56,9 @@ type errorStruct = {
 type choicesStruct = {
   finish_reason: string;
   index: number;
-  message: messageStruct;
+  text: string;
 }
+
 type messageStruct = {
   content: string;
   role: string;
