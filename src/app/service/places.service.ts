@@ -60,7 +60,8 @@ export class PlacesService {
         );
     }
 
-    searchLocalPlaces(location: string, keyword: string, type: PlaceType): Observable<any> {
+
+    searchLocalPlaces(location: string, keyword: string, type: PlaceType, next: boolean = false): Observable<any> {
         let url = this.config.placesUrl + `textsearch/json?`;
         // let url: string = `https://maps.googleapis.com/maps/api/place/textsearch/json?`;
 
@@ -68,6 +69,12 @@ export class PlacesService {
             url += `&type=${type}`;
         }
         url += `query=${keyword}+in+${location}`;
+
+        if(next){
+            if(Object.keys(this.nextToken).indexOf(keyword)!=-1){
+                url += `&pagetoken=${this.nextToken[keyword]}`;
+            }
+        }
 
         // if (type !== PlaceType.全部) {
         //     url += `query=${keyword}`;
@@ -81,78 +88,103 @@ export class PlacesService {
         );
     }
 
-    attractionsInf!: Place
-    hotelInf!: Place
-    foodInf!: Place
+    attractionsInf!: Place[];
+    hotelInf!: Place[];
+    foodInf!: Place[];
     dateRange?: Date[];
+
+    selectAttractionsInf!: Place
+    selectHotelInf!: Place
+    selectFoodInf!: Place
+    nextToken: { [key: string]: string } = {}
     searchSelectLocalPlaces() {
-        this.searchCityState.forEach((el) => {
-            let selectCity = el.selectCity == -1 ? LibRandom.randomIndex(this.cityState) : el.selectCity;
-            let selectSate = el.selectSate == -1 ? LibRandom.randomIndex(this.cityState[selectCity].State) : el.selectSate;
-            let city = this.cityState[selectCity].cnName;
-            let state = this.cityState[selectCity].State[selectSate].cnName;
-            let searchPos = el.selectCity == -1 ? city : city + " " + state
-            let attractions = "";
-            let hotel = "";
-            let food = "";
-            let sd = this.dateRange[0].getFullYear() + "年" + (this.dateRange[0].getMonth() + 1) + "月" + this.dateRange[0].getDate() + "日";
-            let ed = this.dateRange[1].getFullYear() + "年" + (this.dateRange[1].getMonth() + 1) + "月" + this.dateRange[1].getDate() + "日";
-            let time = sd + "~" + ed;
+        let el = this.searchCityState[this.searchCityState.length - 1];
+        // this.searchCityState.forEach((el) => {
+        let selectCity = el.selectCity == -1 ? LibRandom.randomIndex(this.cityState) : el.selectCity;
+        let selectSate = el.selectSate == -1 ? LibRandom.randomIndex(this.cityState[selectCity].State) : el.selectSate;
+        let city = this.cityState[selectCity].cnName;
+        let state = this.cityState[selectCity].State[selectSate].cnName;
+        let searchPos = el.selectCity == -1 ? city : city + " " + state
+        let attractions = "";
+        let hotel = "";
+        let food = "";
+        // let sd = this.dateRange[0].getFullYear() + "年" + (this.dateRange[0].getMonth() + 1) + "月" + this.dateRange[0].getDate() + "日";
+        // let ed = this.dateRange[1].getFullYear() + "年" + (this.dateRange[1].getMonth() + 1) + "月" + this.dateRange[1].getDate() + "日";
+        // let time = sd + "~" + ed;
+
+        el.searchPos = searchPos;
+        forkJoin(
+            [
+                this.searchLocalPlaces(searchPos, "景點", PlaceType.全部),
+                this.searchLocalPlaces(searchPos, "美食", PlaceType.全部),
+                // this.searchLocalPlaces(searchPos, "旅店", PlaceType.全部)
+            ]
+        ).subscribe(el => {
+            // const diffTime = Math.abs(this.dateRange[0].getTime() - this.dateRange[1].getTime()); // 取得相差的毫秒數
+            // const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // 將毫秒數轉換為天數
+            // const diffDays = 1;
+
+            console.log("================================");
+            console.log(el);
+            this.nextToken["景點"] = el[0].next_page_token;
+            this.nextToken["美食"] = el[1].next_page_token;
+
+            this.attractionsInf = el[0];
+            this.attractionsInf.forEach(el => {
+                el["checked"] = false;
+            })
+            // attractions = el[0].map(x => x.name).join("、");
+            // let attractionsArr: Place[] = LibRandom.selectRandomItemsFromArray(this.attractionsInf, 3, 5);
+
+            // attractions = attractionsArr.map(x => x.name).join("、");
 
 
-            forkJoin(
-                [
-                    this.searchLocalPlaces(searchPos, "景點", PlaceType.全部),
-                    this.searchLocalPlaces(searchPos, "旅店", PlaceType.全部),
-                    this.searchLocalPlaces(searchPos, "美食", PlaceType.全部)
-                ]
-            ).subscribe(el => {
-                const diffTime = Math.abs(this.dateRange[0].getTime() - this.dateRange[1].getTime()); // 取得相差的毫秒數
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // 將毫秒數轉換為天數
 
-                console.log("================================");
-                console.log(el);
-                this.attractionsInf = el[0];
-                // attractions = el[0].map(x => x.name).join("、");
-                attractions = LibRandom.selectRandomItemsFromArray(el[0].map(x => x.name), 3 * diffDays, 5 * diffDays).join("、");
+            this.foodInf = el[1];
+            this.foodInf.forEach(el => {
+                el["checked"] = false;
+            })
+            // food = el[2].map(x => x.name).join("、");
+            // food = LibRandom.selectRandomItemsFromArray(el[1].map(x => x.name), 3, 5).join("、S");
 
-                this.hotelInf = el[1];
-                // hotel = el[1].map(x => x.name).join("、");
-                hotel = LibRandom.selectRandomItemsFromArray(el[1].map(x => x.name), 1 * diffDays, 3 * diffDays).join("、");
+            // this.hotelInf = el[2];
+            // hotel = el[1].map(x => x.name).join("、");
+            // hotel = LibRandom.selectRandomItemsFromArray(el[2].map(x => x.name), 1 * diffDays, 3 * diffDays).join("、");
 
-                this.foodInf = el[2];
-                // food = el[2].map(x => x.name).join("、");
-                food = LibRandom.selectRandomItemsFromArray(el[2].map(x => x.name), 3 * diffDays, 5 * diffDays).join("、S");
-
-                if (attractions != "" && hotel != "" && food != "" && time != "") {
-                    this.travelPlan(attractions, hotel, food, time)
-                }
-            });
-        })
+            // if (attractions != "" && hotel != "" && food != "" && time != "") {
+            //     this.travelPlan(attractions, hotel, food, time)
+            // }
+        });
+        // })
     }
 
     travelPlan(attractions: string, hotel: string, food: string, time: string): void {
-        this.apiCallService.AITravelPlan.call(
-            {
-                attractions: attractions,
-                hotel: hotel,
-                food: food,
-                time: time
-            }
-        ).subscribe(
-            (res: API_Response) => {
-                if (res.error != undefined) {
+        let randomCount = LibRandom.getRandomNumberInRange(3, 5);
+        LibRandom.getRandomNumbersInRange(0, this.attractionsInf.length - 1, randomCount);
+        let randomCount2 = LibRandom.getRandomNumberInRange(3, 5);
+        LibRandom.getRandomNumbersInRange(0, this.foodInf.length - 1, randomCount2);
 
-                } else {
-                    let result = "";
-                    if (res.choices.length > 0)
-                        result = res.choices[0].text;
-                }
+        // this.apiCallService.AITravelPlan.call(
+        //     {
+        //         attractions: attractions,
+        //         hotel: hotel,
+        //         food: food,
+        //         time: time
+        //     }
+        // ).subscribe(
+        //     (res: API_Response) => {
+        //         if (res.error != undefined) {
 
-            },
-            (err) => {
+        //         } else {
+        //             let result = "";
+        //             if (res.choices.length > 0)
+        //                 result = res.choices[0].text;
+        //         }
 
-            }
-        );
+        //     },
+        //     (err) => {
+
+        //     }
+        // );
     }
 }

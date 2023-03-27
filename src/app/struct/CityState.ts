@@ -12,9 +12,14 @@ export interface State {
 export class SearchCityState {
   selectCity: number = -1;
   selectSate: number = -1;
+  isAttractionsRandom:boolean = false;
+  isFoodRandom:boolean = false;
+  searchPos: string = "";
+  plan: string = "";
 }
 
 export interface Place {
+  checked: boolean
   name: string;
   rating: number;
   formatted_address: string;

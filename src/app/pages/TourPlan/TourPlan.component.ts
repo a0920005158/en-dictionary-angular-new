@@ -128,7 +128,15 @@ export class TourPlanComponent implements OnInit {
     this.placesService.dateRange = val;
   }
 
-  get attractionsInf(): Place {
+  get attractionsInf(): Place[] {
     return this.placesService.attractionsInf;
+  }
+
+  onAttracitonsScroll(searchPos: string) {
+    this.placesService.searchLocalPlaces(searchPos, "景點", PlaceType.全部, true)
+  }
+
+  onFoodsScroll(searchPos: string) {
+    this.placesService.searchLocalPlaces(searchPos, "景點", PlaceType.全部, true)
   }
 }

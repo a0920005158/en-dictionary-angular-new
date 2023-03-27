@@ -29,4 +29,18 @@ export class LibRandom {
   static getRandomNumberInRange(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1) + min);
   }
+
+  static getRandomNumbersInRange(min: number, max: number, count: number): number[] {
+    const result: number[] = [];
+    if (count > max - min + 1) {
+      throw new Error('Count cannot be larger than range');
+    }
+    while (result.length < count) {
+      const num = Math.floor(Math.random() * (max - min + 1)) + min;
+      if (!result.includes(num)) {
+        result.push(num);
+      }
+    }
+    return result;
+  }
 }

@@ -28,6 +28,7 @@ import { ConfigService } from "./service/config.service";
 import { SocialLoginModule, SocialAuthServiceConfig } from '@abacritt/angularx-social-login';
 import { GoogleLoginProvider, FacebookLoginProvider } from '@abacritt/angularx-social-login';
 import { AgmCoreModule } from '@agm/core';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
 // import { HomeComponent } from "./pages/home/home.component";
 @NgModule({
@@ -49,7 +50,8 @@ import { AgmCoreModule } from '@agm/core';
     RouterModule,
     AppRoutingModule,
     SocialLoginModule,
-    PagesModule
+    PagesModule,
+    InfiniteScrollModule
     // BsDropdownModule.forRoot(),
     // ProgressbarModule.forRoot(),
     // TooltipModule.forRoot(),
