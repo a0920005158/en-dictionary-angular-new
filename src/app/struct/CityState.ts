@@ -12,13 +12,19 @@ export interface State {
 export class SearchCityState {
   selectCity: number = -1;
   selectSate: number = -1;
-  isAttractionsRandom:boolean = false;
-  isFoodRandom:boolean = false;
+  isAttractionsRandom: boolean = false;
+  isFoodRandom: boolean = false;
   searchPos: string = "";
   plan: string = "";
+  trans: string = "開車";
 }
 
 export interface Place {
+  next_page_token: string
+  results: PlaceResult[]
+}
+
+export interface PlaceResult {
   checked: boolean
   name: string;
   rating: number;

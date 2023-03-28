@@ -23,6 +23,11 @@ import { RegisterpageComponent } from "./examples/registerpage/registerpage.comp
 import { LandingpageComponent } from "./examples/landingpage/landingpage.component";
 import { HomeComponent } from './home/home.component';
 import { TourPlanComponent } from "./TourPlan/TourPlan.component";
+
+import { SafeHtmlPipe } from 'src/app/pipe/safe-html.pipe';
+
+import { HttpClientModule } from '@angular/common/http';
+import { AngularEditorModule } from '@kolkov/angular-editor';
 @NgModule({
   imports: [
     CommonModule,
@@ -40,7 +45,9 @@ import { TourPlanComponent } from "./TourPlan/TourPlan.component";
     AlertModule.forRoot(),
     BsDatepickerModule.forRoot(),
     CarouselModule.forRoot(),
-    ModalModule.forRoot()
+    ModalModule.forRoot(),
+    HttpClientModule,
+    AngularEditorModule
   ],
   declarations: [
     IndexComponent,
@@ -48,14 +55,17 @@ import { TourPlanComponent } from "./TourPlan/TourPlan.component";
     RegisterpageComponent,
     LandingpageComponent,
     HomeComponent,
-    TourPlanComponent
+    TourPlanComponent,
+    SafeHtmlPipe
   ],
   exports: [
     IndexComponent,
     ProfilepageComponent,
     RegisterpageComponent,
     LandingpageComponent,
-    HomeComponent
+    HomeComponent,
+    TourPlanComponent,
+    SafeHtmlPipe
   ],
   providers: []
 })

@@ -33,9 +33,8 @@ export class API_AITravelPlan extends API_Base {
 
 type AIConversationData = {
   attractions: string;
-  hotel: string;
-  food: string;
-  time: string;
+  food: string; 
+  trans: string;
 }
 
 export type API_Response = {

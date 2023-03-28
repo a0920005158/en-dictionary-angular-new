@@ -56,12 +56,12 @@ export class PlacesService {
 
         url += `&key=${this.API_KEY}`
         return this.ajax.get(url).pipe(
-            map((response: any) => response.results)
+            map((response: any) => response)
         );
     }
 
 
-    searchLocalPlaces(location: string, keyword: string, type: PlaceType, next: boolean = false): Observable<any> {
+    searchLocalPlaces(location: string, keyword: string, type: PlaceType, nextToken: string = ""): Observable<any> {
         let url = this.config.placesUrl + `textsearch/json?`;
         // let url: string = `https://maps.googleapis.com/maps/api/place/textsearch/json?`;
 
@@ -70,33 +70,45 @@ export class PlacesService {
         }
         url += `query=${keyword}+in+${location}`;
 
-        if(next){
-            if(Object.keys(this.nextToken).indexOf(keyword)!=-1){
-                url += `&pagetoken=${this.nextToken[keyword]}`;
-            }
+        if (nextToken != "") {
+            url += `&pagetoken=${nextToken}`;
         }
-
-        // if (type !== PlaceType.全部) {
-        //     url += `query=${keyword}`;
-        // } else {
-        //     url += `query=${keyword}+in+${location}`;
-        // }
 
         url += `&key=${this.API_KEY}`
         return this.ajax.get(url).pipe(
-            map((response: any) => response.results)
+            map((response: any) => response)
         );
     }
 
-    attractionsInf!: Place[];
-    hotelInf!: Place[];
-    foodInf!: Place[];
+    attractionsScroll(searchPos: string) {
+        let next_page_token = this.attractionsInf[searchPos].next_page_token;
+        this.searchLocalPlaces(searchPos, "景點", PlaceType.全部, next_page_token).subscribe((res: Place) => {
+            let test = this.attractionsInf[searchPos];
+            this.attractionsInf[searchPos].next_page_token = res.next_page_token;
+            res.results.forEach(el => {
+                this.attractionsInf[searchPos].results.push(el);
+            })
+        });
+    }
+
+    foodsScroll(searchPos: string) {
+        this.searchLocalPlaces(searchPos, "美食", PlaceType.全部, this.foodInf[searchPos].next_page_token).subscribe((res: Place) => {
+            this.foodInf[searchPos].next_page_token = res.next_page_token;
+            res.results.forEach(el => {
+                this.foodInf[searchPos].results.push(el);
+            })
+        });
+    }
+
+    attractionsInf: { [key: string]: Place } = {};
+    hotelInf: { [key: string]: Place } = {};
+    foodInf: { [key: string]: Place } = {};
+
+    // attractionsInf = new Map();
+    // hotelInf = new Map();
+    // foodInf = new Map();
     dateRange?: Date[];
 
-    selectAttractionsInf!: Place
-    selectHotelInf!: Place
-    selectFoodInf!: Place
-    nextToken: { [key: string]: string } = {}
     searchSelectLocalPlaces() {
         let el = this.searchCityState[this.searchCityState.length - 1];
         // this.searchCityState.forEach((el) => {
@@ -113,24 +125,25 @@ export class PlacesService {
         // let time = sd + "~" + ed;
 
         el.searchPos = searchPos;
+        if (this.attractionsInf.hasOwnProperty(searchPos) && this.foodInf.hasOwnProperty(searchPos))
+            return;
+
         forkJoin(
             [
                 this.searchLocalPlaces(searchPos, "景點", PlaceType.全部),
                 this.searchLocalPlaces(searchPos, "美食", PlaceType.全部),
                 // this.searchLocalPlaces(searchPos, "旅店", PlaceType.全部)
             ]
-        ).subscribe(el => {
+        ).subscribe((el: Place[]) => {
             // const diffTime = Math.abs(this.dateRange[0].getTime() - this.dateRange[1].getTime()); // 取得相差的毫秒數
             // const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // 將毫秒數轉換為天數
             // const diffDays = 1;
 
             console.log("================================");
             console.log(el);
-            this.nextToken["景點"] = el[0].next_page_token;
-            this.nextToken["美食"] = el[1].next_page_token;
 
-            this.attractionsInf = el[0];
-            this.attractionsInf.forEach(el => {
+            this.attractionsInf[searchPos] = el[0];
+            this.attractionsInf[searchPos].results.forEach(el => {
                 el["checked"] = false;
             })
             // attractions = el[0].map(x => x.name).join("、");
@@ -140,8 +153,8 @@ export class PlacesService {
 
 
 
-            this.foodInf = el[1];
-            this.foodInf.forEach(el => {
+            this.foodInf[searchPos] = el[1];
+            this.foodInf[searchPos].results.forEach(el => {
                 el["checked"] = false;
             })
             // food = el[2].map(x => x.name).join("、");
@@ -155,21 +168,67 @@ export class PlacesService {
             //     this.travelPlan(attractions, hotel, food, time)
             // }
         });
-        // })
     }
 
-    travelPlan(attractions: string, hotel: string, food: string, time: string): void {
-        let randomCount = LibRandom.getRandomNumberInRange(3, 5);
-        LibRandom.getRandomNumbersInRange(0, this.attractionsInf.length - 1, randomCount);
-        let randomCount2 = LibRandom.getRandomNumberInRange(3, 5);
-        LibRandom.getRandomNumbersInRange(0, this.foodInf.length - 1, randomCount2);
+    tranvePlan(searchPos: string) {
+        let searchForm = this.searchCityState[this.searchCityState.length - 1];
+        let trans = this.searchCityState[this.searchCityState.length - 1].trans;
+        let attractions = "";
+        let foods = "";
+        if (searchForm.isAttractionsRandom) {
+            let randomCount = LibRandom.getRandomNumberInRange(3, 5);
+            let arrTemp = LibRandom.getRandomNumbersInRange(0, this.attractionsInf[searchPos].results.length - 1, randomCount);
+            let tm = [];
+            arrTemp.forEach(el => {
+                tm.push(this.attractionsInf[searchPos].results[el].name + ":" + this.attractionsInf[searchPos].results[el].formatted_address);
+            })
+            attractions = tm.join(",");
+        } else {
+            attractions = this.attractionsInf[searchPos].results.filter(inf => inf.checked == true).map(x => x.name + ":" + x.formatted_address).join(",");
+        }
 
+        if (searchForm.isFoodRandom) {
+            let randomCount2 = LibRandom.getRandomNumberInRange(3, 5);
+            let arrTemp2 = LibRandom.getRandomNumbersInRange(0, this.foodInf[searchPos].results.length - 1, randomCount2);
+            let tm2 = [];
+            arrTemp2.forEach(el => {
+                tm2.push(this.foodInf[searchPos].results[el].name + ":" + this.foodInf[searchPos].results[el].formatted_address);
+            })
+            foods = tm2.join(",");
+        } else {
+            foods = this.foodInf[searchPos].results.filter(inf => inf.checked == true).map(x => x.name + ":" + x.formatted_address).join(",");
+        }
+        if (attractions == "" || foods == "") {
+            alert("請選擇景點與美食!");
+            return;
+        }
+        this.travelPlanCall(attractions, foods, trans).subscribe(
+            (res: API_Response) => {
+                if (res.error != undefined) {
+
+                } else {
+                    if (res.choices.length > 0)
+                        searchForm.plan = res.choices[0].text;
+                }
+            },
+            (err) => {
+
+            }
+        );
+    }
+    travelPlanCall(attractions: string, foods: string, trans: string): Observable<any> {
+        return this.apiCallService.AITravelPlan.call(
+            {
+                food: foods,
+                attractions: attractions,
+                trans: trans
+            }
+        );
         // this.apiCallService.AITravelPlan.call(
         //     {
+        //         food: foods,
         //         attractions: attractions,
-        //         hotel: hotel,
-        //         food: food,
-        //         time: time
+        //         trans: trans
         //     }
         // ).subscribe(
         //     (res: API_Response) => {

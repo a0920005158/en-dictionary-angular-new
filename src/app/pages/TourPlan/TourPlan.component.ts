@@ -8,6 +8,8 @@ import { SocialUser } from '@abacritt/angularx-social-login';
 import { WordSearch } from 'src/app/struct/WordSearch';
 import { AIConversation } from '../../struct/AIConversation';
 import { CityState, Place, SearchCityState } from 'src/app/struct/CityState';
+import { AngularEditorConfig } from '@kolkov/angular-editor';
+
 
 @Component({
   selector: 'tour-plan',
@@ -15,6 +17,37 @@ import { CityState, Place, SearchCityState } from 'src/app/struct/CityState';
   styleUrls: ['./TourPlan.component.scss']
 })
 export class TourPlanComponent implements OnInit {
+  htmlContent: string = "";
+  config: AngularEditorConfig = {
+    editable: true,
+    spellcheck: true,
+    height: '15rem',
+    minHeight: '5rem',
+    placeholder: 'Enter text here...',
+    translate: 'no',
+    defaultParagraphSeparator: 'p',
+    defaultFontName: 'Arial',
+    toolbarHiddenButtons: [
+      ['bold']
+    ],
+    customClasses: [
+      {
+        name: "quote",
+        class: "quote",
+      },
+      {
+        name: 'redText',
+        class: 'redText'
+      },
+      {
+        name: "titleText",
+        class: "titleText",
+        tag: "h1",
+      },
+    ]
+  };
+
+  trans = ["開車", "公共交通運輸"]
   selfRole = ChatRole.自己;
   robotRole = ChatRole.機器人;
   recognitionText: string = "";
@@ -116,8 +149,16 @@ export class TourPlanComponent implements OnInit {
     this.placesService.searchCityState.push(new SearchCityState);
   }
 
+  isEdit = false
+  editPlan() {
+    this.isEdit = true;
+  }
+
   searchLocalPlaces() {
     this.placesService.searchSelectLocalPlaces();
+  }
+  tranvePlan(searchPos: string) {
+    this.placesService.tranvePlan(searchPos);
   }
 
   get dateRange(): Date[] {
@@ -128,15 +169,19 @@ export class TourPlanComponent implements OnInit {
     this.placesService.dateRange = val;
   }
 
-  get attractionsInf(): Place[] {
+  get attractionsInf(): { [key: string]: Place } {
     return this.placesService.attractionsInf;
   }
 
-  onAttracitonsScroll(searchPos: string) {
-    this.placesService.searchLocalPlaces(searchPos, "景點", PlaceType.全部, true)
+  get foodInf(): { [key: string]: Place } {
+    return this.placesService.foodInf;
+  }
+
+  onAttractionsScroll(searchPos: string) {
+    this.placesService.attractionsScroll(searchPos);
   }
 
   onFoodsScroll(searchPos: string) {
-    this.placesService.searchLocalPlaces(searchPos, "景點", PlaceType.全部, true)
+    this.placesService.foodsScroll(searchPos);
   }
 }

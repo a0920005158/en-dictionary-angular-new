@@ -84,137 +84,165 @@
         <div class="squares square7"></div>
 
         <div class="container">
+            <angular-editor  [(ngModel)]="htmlContent" [config]="config"></angular-editor>
+            
             <div class="content-center">
                 <div class="form-row" *ngFor="let item of this.searchCityState;index as ii">
-                    <div class="form-group col-md-5">
-                        <label [for]="'inputCity'+ii">城市/{{item.selectCity}}</label>
-                        <select [id]="'inputCity'+ii" class="form-control" [(ngModel)]="item.selectCity">
-                            <option value="-1">隨機</option>
-                            <option *ngFor="let citem of this.cityState;index as i" [value]="i">{{citem.cnName}}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="form-group col-md-5">
-                        <label [for]="'inputState'+ii">鄉鎮/{{item.selectSate}}</label>
-                        <select [id]="'inputState'+ii" class="form-control" [(ngModel)]="item.selectSate">
-                            <option value="-1">隨機</option>
-                            <ng-container *ngIf="item.selectCity!=-1">
-                                <option *ngFor="let sitem of this.cityState[item.selectCity].State;index as j"
-                                    [value]="j">
-                                    {{sitem.cnName}}
+                    <ng-container *ngIf="item.plan=='';else planed">
+                        <div class="form-group col-md-5">
+                            <label [for]="'inputCity'+ii">城市</label>
+                            <select [id]="'inputCity'+ii" class="form-control" [(ngModel)]="item.selectCity">
+                                <option value="-1">隨機</option>
+                                <option *ngFor="let citem of this.cityState;index as i" [value]="i">{{citem.cnName}}
                                 </option>
-                            </ng-container>
-                        </select>
-                    </div>
-
-                    <div *ngIf="item.plan=='';else selectAF" class="form-group col-md-10">
-                        <button (click)="searchLocalPlaces()" type="submit" class="btn btn-primary">搜尋景點</button>
-                    </div>
-
-                    <ng-template #selectAF>
-                        <div class="form-group col-md-5">選擇{{item.searchPos}}景點</div>
-                        <div class="form-group col-md-5">選擇{{item.searchPos}}美食</div>
-
-                        <div infiniteScroll [infiniteScrollDistance]="1" [infiniteScrollThrottle]="50"
-                            (scrolled)="onAttractionsScroll(item.searchPos)" [scrollWindow]="false"
-                            class="form-group col-md-5" style="height: 300px;overflow-y: auto;">
-                            <div class="form-check">
-                                <label class="form-check-label">
-                                    <input [(ngModel)]="item.isAttractionsRandom" class="form-check-input"
-                                        type="checkbox">
-                                    隨機景點
-                                    <span class="form-check-sign">
-                                        <span class="check"></span>
-                                    </span>
-                                </label>
-                            </div>
-
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th class="text-center">Checked</th>
-                                        <th>Name</th>
-                                        <th class="text-right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr *ngFor="let aitem of attractionsInf;index as ai">
-                                        <td class="text-center">
-                                            <input [(ngModel)]="aitem.checked" class="form-check-input" type="checkbox">
-                                        </td>
-                                        <td>{{aitem.name}}</td>
-                                        <td class="td-actions text-right">
-                                            <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-icon">
-                                                <i class="tim-icons icon-single-02"></i>
-                                            </button>
-                                            <button type="button" rel="tooltip" class="btn btn-success btn-sm btn-icon">
-                                                <i class="tim-icons icon-settings-gear-63"></i>
-                                            </button>
-                                            <button type="button" rel="tooltip" class="btn btn-danger btn-sm btn-icon">
-                                                <i class="tim-icons icon-simple-remove"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-5">
+                            <label [for]="'inputState'+ii">鄉鎮</label>
+                            <select [id]="'inputState'+ii" class="form-control" [(ngModel)]="item.selectSate">
+                                <option value="-1">隨機</option>
+                                <ng-container *ngIf="item.selectCity!=-1">
+                                    <option *ngFor="let sitem of this.cityState[item.selectCity].State;index as j"
+                                        [value]="j">
+                                        {{sitem.cnName}}
+                                    </option>
+                                </ng-container>
+                            </select>
                         </div>
 
-                        <div infiniteScroll [infiniteScrollDistance]="1" [infiniteScrollThrottle]="50"
-                            (scrolled)="onFoodsScroll(item.searchPos)" [scrollWindow]="false" class="form-group col-md-5"
-                            style="height: 300px;overflow-y: auto;">
-                            <div class="form-check">
-                                <label class="form-check-label">
-                                    <input [(ngModel)]="item.isFoodRandom" class="form-check-input" type="checkbox">
-                                    隨機美食
-                                    <span class="form-check-sign">
-                                        <span class="check"></span>
-                                    </span>
-                                </label>
+                        <div *ngIf="item.searchPos=='';else selectAF" class="form-group col-md-10">
+                            <button (click)="searchLocalPlaces()" type="submit" class="btn btn-primary">搜尋景點</button>
+                        </div>
+
+                        <ng-template #selectAF>
+                            <div class="form-group col-md-10">
+                                <div *ngFor="let titem of trans" class="form-check form-check-radio form-check-inline">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" type="radio" id="{{ titem }}" name="{{titem}}"
+                                            [value]="titem" [(ngModel)]="item.trans"
+                                            (ngModelChange)="item.trans=$event">
+                                        {{titem}}
+                                        <span class="form-check-sign"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-5">選擇{{item.searchPos}}景點</div>
+                            <div class="form-group col-md-5">選擇{{item.searchPos}}美食</div>
+
+                            <div class="form-group col-md-5">
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input [(ngModel)]="item.isAttractionsRandom" class="form-check-input"
+                                            type="checkbox">
+                                        隨機景點
+                                        <span class="form-check-sign">
+                                            <span class="check"></span>
+                                        </span>
+                                    </label>
+                                </div>
                             </div>
 
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th class="text-center">Checked</th>
-                                        <th>Name</th>
-                                        <th class="text-right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr *ngFor="let fitem of foodInf;index as ai">
-                                        <td class="text-center">
-                                            <input [(ngModel)]="fitem.checked" class="form-check-input" type="checkbox">
-                                        </td>
-                                        <td>{{fitem.name}}</td>
-                                        <td class="td-actions text-right">
-                                            <button type="button" rel="tooltip" class="btn btn-info btn-sm btn-icon">
-                                                <i class="tim-icons icon-single-02"></i>
-                                            </button>
-                                            <button type="button" rel="tooltip" class="btn btn-success btn-sm btn-icon">
-                                                <i class="tim-icons icon-settings-gear-63"></i>
-                                            </button>
-                                            <button type="button" rel="tooltip" class="btn btn-danger btn-sm btn-icon">
-                                                <i class="tim-icons icon-simple-remove"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                            <div class="form-group col-md-5">
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input [(ngModel)]="item.isFoodRandom" class="form-check-input" type="checkbox">
+                                        隨機美食
+                                        <span class="form-check-sign">
+                                            <span class="check"></span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-5" style="height: 300px;overflow-y: auto;">
+                                <table class="table" *ngIf="attractionsInf.hasOwnProperty(item.searchPos)">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">Checked</th>
+                                            <th>Name</th>
+                                            <th class="text-right">Stars</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let aitem of attractionsInf[item.searchPos].results;index as ai">
+                                            <td class="text-center">
+                                                <input [disabled]="item.isAttractionsRandom" [(ngModel)]="aitem.checked"
+                                                    class="form-check-input" type="checkbox">
+                                            </td>
+                                            <td>
+                                                <!-- {{aitem.name}} -->
+
+                                                <button class="btn btn-default btn-sm mr-1" container="body"
+                                                    placement="bottom" [popoverTitle]="aitem.name"
+                                                    [popover]="aitem.formatted_address" type="button">
+                                                    {{aitem.name}}
+                                                </button>
+                                            </td>
+                                            <td>
+                                                {{aitem.rating}}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="td-actions text-center" colspan="3">
+                                                <button (click)="onAttractionsScroll(item.searchPos)" type="button"
+                                                    class="btn btn-success btn-sm">加載更多資訊...</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="form-group col-md-5" style="height: 300px;overflow-y: auto;">
+                                <table class="table" *ngIf="foodInf.hasOwnProperty(item.searchPos)">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">Checked</th>
+                                            <th>Name</th>
+                                            <th class="text-right">Stars</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let fitem of foodInf[item.searchPos].results;index as ai">
+                                            <td class="text-center">
+                                                <input [disabled]="item.isFoodRandom" [(ngModel)]="fitem.checked"
+                                                    class="form-check-input" type="checkbox">
+                                            </td>
+                                            <td>
+                                                <!-- {{fitem.name}} -->
+
+                                                <button class="btn btn-default btn-sm mr-1" container="body"
+                                                    placement="bottom" [popoverTitle]="fitem.name"
+                                                    [popover]="fitem.formatted_address" type="button">
+                                                    {{fitem.name}}
+                                                </button>
+                                            </td>
+                                            <td>
+                                                {{fitem.rating}}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="td-actions text-center" colspan="3">
+                                                <button (click)="onFoodsScroll(item.searchPos)" type="button"
+                                                    class="btn btn-success btn-sm">加載更多資訊...</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <button (click)="tranvePlan(item.searchPos)" type="submit"
+                                class="btn btn-primary form-group col-md-10">產生第{{ii+1}}天行程</button>
+                        </ng-template>
+                    </ng-container>
+                    <ng-template #planed>
+                        <div *ngIf="!isEdit;else edit" style="white-space: pre-wrap;word-wrap: break-word" [innerHtml]="item.plan|safeHtml"></div>
+                        <button (click)="addCityState()" type="submit" class="btn btn-primary">添加新行程</button>
+                        <button (click)="editPlan()" type="submit" class="btn btn-primary">編輯行程</button>
+                        
+                        <ng-template #edit>
+                            <angular-editor  [(ngModel)]="htmlContent" [config]="config"></angular-editor>
+                        </ng-template>
                     </ng-template>
-
-
-
-
-
-
-                    <!-- <div class="form-group col-md-2">
-                        <label for="inputZip">天數</label>
-                        <input type="number" class="form-control" id="inputZip">
-                    </div> -->
-
-
-                    <!-- <button (click)="searchLocalPlaces()" type="submit" class="btn btn-primary">產生第{{ii+1}}天行程</button> -->
                 </div>
 
                 <!-- <div class="form-row">
@@ -229,31 +257,16 @@
                     </div>
                 </div> -->
 
-                <div class="form-row">
+                <!-- <div class="form-row">
                     <div class="form-group col-md-4">
                         <label for="inputTime">旅遊期間</label>
                         <input [(ngModel)]="dateRange" id="inputTime" type="text" placeholder="Daterangepicker"
                             class="form-control" bsDaterangepicker
                             [bsConfig]="{ isAnimated: true, containerClass: 'theme-red' }">
                     </div>
-                </div>
+                </div> -->
 
                 <!-- <button (click)="addCityState()" type="submit" class="btn btn-primary">添加縣市、鄉鎮</button> -->
-
-
-
-                <div class="form-group">
-                    <div class="form-check">
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" value="">
-                            Check me out
-                            <span class="form-check-sign">
-                                <span class="check"></span>
-                            </span>
-                        </label>
-                    </div>
-                </div>
-
             </div>
         </div>
     </div>

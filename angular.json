@@ -35,7 +35,9 @@
               "src/assets/css/nucleo-icons.css",
               "node_modules/ngx-bootstrap/datepicker/bs-datepicker.css",
               "src/assets/scss/blk-design-system.scss",
-              "src/assets/demo/demo.css"
+              "src/assets/demo/demo.css",
+              "node_modules/@fortawesome/fontawesome-free/css/all.css",
+              "node_modules/@ui4ngx/fontawesome/css/ngx-fontawesome.scss"
             ],
             "scripts": [],
             "aot": false,
@@ -48,10 +50,12 @@
           },
           "configurations": {
             "production": {
-              "fileReplacements": [{
-                "replace": "src/environments/environment.ts",
-                "with": "src/environments/environment.prod.ts"
-              }],
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -61,11 +65,13 @@
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
-              "budgets": [{
-                "type": "initial",
-                "maximumWarning": "2mb",
-                "maximumError": "5mb"
-              }]
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                }
+              ]
             },
             "development": {}
           },
