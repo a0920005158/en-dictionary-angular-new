@@ -25,9 +25,13 @@ import { HomeComponent } from './home/home.component';
 import { TourPlanComponent } from "./TourPlan/TourPlan.component";
 
 import { SafeHtmlPipe } from 'src/app/pipe/safe-html.pipe';
+import { FilterCheckedPipe } from 'src/app/pipe/filter-checked.pipe';
 
 import { HttpClientModule } from '@angular/common/http';
 import { AngularEditorModule } from '@kolkov/angular-editor';
+
+import { SocialLoginModule, SocialAuthServiceConfig } from '@abacritt/angularx-social-login';
+import { GoogleLoginProvider, FacebookLoginProvider } from '@abacritt/angularx-social-login';
 @NgModule({
   imports: [
     CommonModule,
@@ -47,7 +51,8 @@ import { AngularEditorModule } from '@kolkov/angular-editor';
     CarouselModule.forRoot(),
     ModalModule.forRoot(),
     HttpClientModule,
-    AngularEditorModule
+    AngularEditorModule,
+    SocialLoginModule,
   ],
   declarations: [
     IndexComponent,
@@ -56,7 +61,8 @@ import { AngularEditorModule } from '@kolkov/angular-editor';
     LandingpageComponent,
     HomeComponent,
     TourPlanComponent,
-    SafeHtmlPipe
+    SafeHtmlPipe,
+    FilterCheckedPipe
   ],
   exports: [
     IndexComponent,
@@ -65,8 +71,32 @@ import { AngularEditorModule } from '@kolkov/angular-editor';
     LandingpageComponent,
     HomeComponent,
     TourPlanComponent,
-    SafeHtmlPipe
+    SafeHtmlPipe,
+    FilterCheckedPipe
   ],
-  providers: []
+  providers: [
+    ,
+    {
+      provide: 'SocialAuthServiceConfig',
+      useValue: {
+        autoLogin: false,
+        providers: [
+          {
+            id: GoogleLoginProvider.PROVIDER_ID,
+            provider: new GoogleLoginProvider(
+              '1084414905578-pknhub4mtdsq0jj57smh92i9ph025a8q.apps.googleusercontent.com'
+            )
+          },
+          // {
+          //   id: FacebookLoginProvider.PROVIDER_ID,
+          //   provider: new FacebookLoginProvider('clientId')
+          // }
+        ],
+        onError: (err) => {
+          console.error(err);
+        }
+      } as SocialAuthServiceConfig,
+    }
+  ]
 })
 export class PagesModule { }

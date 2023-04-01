@@ -84,8 +84,10 @@
         <div class="squares square7"></div>
 
         <div class="container">
-            <angular-editor  [(ngModel)]="htmlContent" [config]="config"></angular-editor>
-            
+            <div class="loading-overlay" [hidden]="!isLoading">
+                <div class="loading-spinner"></div>
+            </div>
+
             <div class="content-center">
                 <div class="form-row" *ngFor="let item of this.searchCityState;index as ii">
                     <ng-container *ngIf="item.plan=='';else planed">
@@ -166,12 +168,12 @@
                                     <tbody>
                                         <tr *ngFor="let aitem of attractionsInf[item.searchPos].results;index as ai">
                                             <td class="text-center">
-                                                <input [disabled]="item.isAttractionsRandom" [(ngModel)]="aitem.checked"
-                                                    class="form-check-input" type="checkbox">
+                                                <input
+                                                    [disabled]="item.isAttractionsRandom || (getCheckedCount(attractionsInf[item.searchPos].results)&&!aitem.checked)"
+                                                    [(ngModel)]="aitem.checked" class="form-check-input"
+                                                    type="checkbox">
                                             </td>
-                                            <td>
-                                                <!-- {{aitem.name}} -->
-
+                                            <td class="text-left">
                                                 <button class="btn btn-default btn-sm mr-1" container="body"
                                                     placement="bottom" [popoverTitle]="aitem.name"
                                                     [popover]="aitem.formatted_address" type="button">
@@ -204,12 +206,12 @@
                                     <tbody>
                                         <tr *ngFor="let fitem of foodInf[item.searchPos].results;index as ai">
                                             <td class="text-center">
-                                                <input [disabled]="item.isFoodRandom" [(ngModel)]="fitem.checked"
-                                                    class="form-check-input" type="checkbox">
+                                                <input
+                                                    [disabled]="item.isFoodRandom|| (getCheckedCount(foodInf[item.searchPos].results)&&!fitem.checked)"
+                                                    [(ngModel)]="fitem.checked" class="form-check-input"
+                                                    type="checkbox">
                                             </td>
-                                            <td>
-                                                <!-- {{fitem.name}} -->
-
+                                            <td class="text-left">
                                                 <button class="btn btn-default btn-sm mr-1" container="body"
                                                     placement="bottom" [popoverTitle]="fitem.name"
                                                     [popover]="fitem.formatted_address" type="button">
@@ -235,27 +237,44 @@
                         </ng-template>
                     </ng-container>
                     <ng-template #planed>
-                        <div *ngIf="!isEdit;else edit" style="white-space: pre-wrap;word-wrap: break-word" [innerHtml]="item.plan|safeHtml"></div>
-                        <button (click)="addCityState()" type="submit" class="btn btn-primary">添加新行程</button>
-                        <button (click)="editPlan()" type="submit" class="btn btn-primary">編輯行程</button>
-                        
-                        <ng-template #edit>
-                            <angular-editor  [(ngModel)]="htmlContent" [config]="config"></angular-editor>
-                        </ng-template>
+
                     </ng-template>
                 </div>
+                <div class="form-row" *ngIf="exportPlanDoc!=''">
 
-                <!-- <div class="form-row">
-                    <div class="form-group col-md-10">
-                        <label for="inputTime">挑選景點</label>
-                        <div *ngFor="let aitem of attractionsInf;index as ai" class="form-check form-check-inline">
-                            <label class="form-check-label">
-                                <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1"> {{aitem.name}}
-                                <span class="form-check-sign"></span>
-                            </label>
+                    <ng-container *ngIf="!isExportPlan;else export">
+                        <div class="form-group col-md-10">
+                            <angular-editor [(ngModel)]="exportPlanDoc" [config]="config"></angular-editor>
                         </div>
-                    </div>
-                </div> -->
+                        <div class="form-group col-md-5"><button (click)="addCityState()" type="submit"
+                                class="btn btn-primary">添加新行程</button>
+                        </div>
+                        <div class="form-group col-md-5"><button (click)="exportPlan()" type="submit"
+                                class="btn btn-primary">匯出行程</button>
+                        </div>
+                    </ng-container>
+                    <ng-template #export>
+                        <div class="form-group col-md-10">
+                            <div class="text-pre" [innerHtml]="exportPlanDoc|safeHtml"></div>
+                        </div>
+
+                        <div class="form-group col-md-5">
+                            <label class="form-check-label">
+                                若要儲存形成請先登入google帳號
+                            </label>
+
+                            <button *ngIf="LoginService.loggedIn;else login" (click)="storePlan()" type="submit"
+                                class="btn btn-primary">儲存</button>
+                            <ng-template #login>
+                                <asl-google-signin-button type='standard' size='large'></asl-google-signin-button>
+                            </ng-template>
+                        </div>
+                        <div class="form-group col-md-5">
+                            <button (click)="exportPlan()" type="submit" class="btn btn-primary">匯出pdf</button>
+                        </div>
+
+                    </ng-template>
+                </div>
 
                 <!-- <div class="form-row">
                     <div class="form-group col-md-4">
@@ -265,8 +284,6 @@
                             [bsConfig]="{ isAnimated: true, containerClass: 'theme-red' }">
                     </div>
                 </div> -->
-
-                <!-- <button (click)="addCityState()" type="submit" class="btn btn-primary">添加縣市、鄉鎮</button> -->
             </div>
         </div>
     </div>

@@ -29,6 +29,7 @@ export interface PlaceResult {
   name: string;
   rating: number;
   formatted_address: string;
+  place_id: string;
   geometry: {
     location: {
       lat: number;

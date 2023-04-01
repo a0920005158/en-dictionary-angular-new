@@ -1,14 +1,15 @@
 import { PlacesService } from '../../service/places.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import noUiSlider from "nouislider";
 import { SpeechRecognitionService } from 'src/app/service/speech-recognition.service';
 import { AIConversationService } from 'src/app/service/ai-conversation.service';
 import { WordService } from 'src/app/service/word.service';
-import { SocialUser } from '@abacritt/angularx-social-login';
+import { GoogleLoginProvider, SocialAuthService, SocialUser } from '@abacritt/angularx-social-login';
 import { WordSearch } from 'src/app/struct/WordSearch';
 import { AIConversation } from '../../struct/AIConversation';
-import { CityState, Place, SearchCityState } from 'src/app/struct/CityState';
+import { CityState, Place, PlaceResult, SearchCityState } from 'src/app/struct/CityState';
 import { AngularEditorConfig } from '@kolkov/angular-editor';
+import { LoginService } from "src/app/service/login.service";
 
 
 @Component({
@@ -17,6 +18,24 @@ import { AngularEditorConfig } from '@kolkov/angular-editor';
   styleUrls: ['./TourPlan.component.scss']
 })
 export class TourPlanComponent implements OnInit {
+  @HostListener('window:beforeunload', ['$event'])
+  beforeunloadHandler(event) {
+    // 在此加入拒絕離開的程式碼
+    if (!confirm("要離開網站嗎?系統可能不會儲存你所做的變更。")) {
+      event.preventDefault();
+      event.returnValue = false;
+    }
+  }
+
+  @HostListener('window:unload', ['$event'])
+  unloadHandler(event) {
+    // 在此加入拒絕離開的程式碼
+    if (!confirm("要離開網站嗎?系統可能不會儲存你所做的變更。")) {
+      event.preventDefault();
+      event.returnValue = false;
+    }
+  }
+
   htmlContent: string = "";
   config: AngularEditorConfig = {
     editable: true,
@@ -71,7 +90,9 @@ export class TourPlanComponent implements OnInit {
     private speechRecognitionService: SpeechRecognitionService,
     private AIConversation: AIConversationService,
     private wordService: WordService,
-    private placesService: PlacesService
+    private placesService: PlacesService,
+    public LoginService: LoginService,
+    private authService: SocialAuthService,
   ) { }
   scrollToDownload(element: any) {
     element.scrollIntoView({ behavior: "smooth" });
@@ -79,6 +100,18 @@ export class TourPlanComponent implements OnInit {
   ngOnInit() {
     var body = document.getElementsByTagName("body")[0];
     body.classList.add("index-page");
+
+    if (this.LoginService.user == null) {
+      this.authService.authState.subscribe((user) => {
+        this.LoginService.user = user;
+        this.LoginService.loggedIn = (user != null);
+      });
+    } else {
+      console.log('logined!!');
+      console.log(
+        this.LoginService.user
+      );
+    }
   }
 
   ngOnDestroy() {
@@ -149,11 +182,6 @@ export class TourPlanComponent implements OnInit {
     this.placesService.searchCityState.push(new SearchCityState);
   }
 
-  isEdit = false
-  editPlan() {
-    this.isEdit = true;
-  }
-
   searchLocalPlaces() {
     this.placesService.searchSelectLocalPlaces();
   }
@@ -183,5 +211,38 @@ export class TourPlanComponent implements OnInit {
 
   onFoodsScroll(searchPos: string) {
     this.placesService.foodsScroll(searchPos);
+  }
+
+  get isLoading(): boolean {
+    return this.placesService.isLoading;
+  }
+
+  isExportPlan = false;
+  exportPlan() {
+    this.isExportPlan = true;
+  }
+
+  get exportPlanDoc(): string {
+    return this.placesService.exportPlanDoc;
+  }
+
+  set exportPlanDoc(val: string) {
+    this.placesService.exportPlanDoc = val;
+  }
+
+  getCheckedCount(value: PlaceResult[]) {
+    let count = value.filter(x => x.checked == true).length;
+    if (count > 2) {
+      return true;
+    }
+    return false
+  }
+
+  storePlan() {
+    if (this.LoginService.loggedIn) {
+
+    } else {
+      
+    }
   }
 }
