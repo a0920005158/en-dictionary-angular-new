@@ -23,6 +23,9 @@ import { RegisterpageComponent } from "./examples/registerpage/registerpage.comp
 import { LandingpageComponent } from "./examples/landingpage/landingpage.component";
 import { HomeComponent } from './home/home.component';
 import { TourPlanComponent } from "./TourPlan/TourPlan.component";
+import { MyPlanComponent } from "./examples/MyPlan/MyPlan.component";
+import { AllPlanComponent } from './examples/AllPlan/AllPlan.component';
+import { ContactMeComponent } from './examples/ContactMe/ContactMe.component';
 
 import { SafeHtmlPipe } from 'src/app/pipe/safe-html.pipe';
 import { FilterCheckedPipe } from 'src/app/pipe/filter-checked.pipe';
@@ -61,8 +64,11 @@ import { GoogleLoginProvider, FacebookLoginProvider } from '@abacritt/angularx-s
     LandingpageComponent,
     HomeComponent,
     TourPlanComponent,
+    MyPlanComponent,
+    AllPlanComponent,
+    ContactMeComponent,
     SafeHtmlPipe,
-    FilterCheckedPipe
+    FilterCheckedPipe,
   ],
   exports: [
     IndexComponent,
@@ -71,11 +77,13 @@ import { GoogleLoginProvider, FacebookLoginProvider } from '@abacritt/angularx-s
     LandingpageComponent,
     HomeComponent,
     TourPlanComponent,
+    MyPlanComponent,
+    AllPlanComponent,
+    ContactMeComponent,
     SafeHtmlPipe,
-    FilterCheckedPipe
+    FilterCheckedPipe,
   ],
   providers: [
-    ,
     {
       provide: 'SocialAuthServiceConfig',
       useValue: {

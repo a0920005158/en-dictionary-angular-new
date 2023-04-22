@@ -1,0 +1,150 @@
+<nav class="navbar navbar-expand-lg fixed-top navbar-transparent" color-on-scroll="100" id="navbar-top">
+  <div class="container">
+    <div class="navbar-translate">
+      <a class="navbar-brand" [routerLink]="['/tour-plan']" placement="bottom"
+        tooltip="Designed and Coded by Creative Tim">
+        <span> 產生、分享 </span> 您的旅遊計畫
+      </a>
+      <button aria-controls="navigation-index" aria-label="Toggle navigation" class="navbar-toggler navbar-toggler"
+        [attr.aria-expanded]="!isCollapsed" (click)="isCollapsed = !isCollapsed" id="navigation" type="button">
+        <span class="navbar-toggler-bar bar1"> </span>
+        <span class="navbar-toggler-bar bar2"> </span>
+        <span class="navbar-toggler-bar bar3"> </span>
+      </button>
+    </div>
+    <div class="navbar-collapse justify-content-end" [collapse]="isCollapsed" id="navigation">
+      <div class="navbar-collapse-header">
+        <div class="row">
+          <div class="col-6 collapse-brand"><a> Plan• </a></div>
+          <div class="col-6 collapse-close text-right">
+            <button aria-controls="navigation-index" aria-label="Toggle navigation" class="navbar-toggler"
+              [attr.aria-expanded]="!isCollapsed" (click)="isCollapsed = !isCollapsed" id="navigation" type="button">
+              <i class="tim-icons icon-simple-remove"> </i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="['/tour-plan']"> Back to Kit </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="wrapper">
+  <div class="main" style="min-height: 100vh;">
+    <div class="page-header-image"></div>
+    <div class="content">
+      <div class="container" style="position: relative;top: 100px;">
+        <div class="loading-overlay" [hidden]="!isLoading">
+          <div class="loading-spinner"></div>
+        </div>
+
+        <div class="row">
+          <div class="col-lg-12 col-md-6 offset-lg-0 offset-md-3">
+            <div class="square square-7" id="square7"></div>
+            <div class="square square-8" id="square8"></div>
+            <div class="card card-register">
+              <div class="card-header">
+                <img alt="Card image" class="card-img" src="assets/img/square1-red.png" />
+
+                <h4 class="card-title">my Plan</h4>
+              </div>
+              <div class="card-body">
+                <div class="col-lg-12">
+
+                  <table class="table" *ngIf="LoginService.loggedIn;else login">
+                    <thead>
+                      <tr>
+                        <th>標題</th>
+                        <th>創建時間</th>
+                        <th>發布狀態</th>
+                        <th class="text-right">操作</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of myPlan.List; let i=index">
+                        <td>
+                          <button class="btn btn-success" data-target="#myModal2"
+                            (click)="showPlanIndex=i;myModal2.show()">
+                            {{item.title}}
+                          </button>
+                        </td>
+                        <td>{{item.created_at}}</td>
+                        <td>{{item.isOp?"已發布":"未發布"}}</td>
+                        <td class="td-actions text-right">
+                          <button *ngIf="!item.isOp" (click)="releasePlan(item.id)" type="button" rel="tooltip"
+                            class="btn btn-primary">發布
+                            <i class="tim-icons icon-send"></i>
+                          </button>
+
+                          <button *ngIf="item.isOp" (click)="releasePlan(item.id)" type="button" rel="tooltip"
+                            class="btn btn-primary">取消發布
+                            <i class="tim-icons icon-send"></i>
+                          </button>
+
+                          <button (click)="deletePlan(item.id)" type="button" rel="tooltip"
+                            class="btn btn-danger btn-icon">
+                            <i class="tim-icons icon-simple-remove"></i>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="4">
+                          <nav aria-label="Page navigation example">
+                            <pagination [(ngModel)]="myPlan.pg.current" [totalItems]="myPlan.pg.pagesize"
+                              (ngModelChange)="getPlan($event)">
+                            </pagination>
+                          </nav>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <ng-template #login>
+                    <asl-google-signin-button type='standard' size='large'
+                      logo_alignment="center"></asl-google-signin-button>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="register-bg"></div>
+        <div class="square square-1" id="square1"></div>
+        <div class="square square-2" id="square2"></div>
+        <div class="square square-3" id="square3"></div>
+        <div class="square square-4" id="square4"></div>
+        <div class="square square-5" id="square5"></div>
+        <div class="square square-6" id="square6"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div aria-hidden="true" aria-labelledby="myModalLabel" bsModal class="modal fade modal-black" #myModal2="bs-modal"
+  id="myModal2" role="dialog" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content" *ngIf="myPlan.List.length>0">
+      <div class="modal-header justify-content-center">
+        <button aria-hidden="true" class="close" data-dismiss="modal" (click)="myModal2.hide()" type="button">
+          <i class="tim-icons icon-simple-remove text-white"> </i>
+        </button>
+        <div class="text-muted text-center ml-auto mr-auto">
+          <h3 class="mb-0">{{myPlan.List[showPlanIndex].title}}</h3>
+        </div>
+      </div>
+
+      <div class="modal-header justify-content-center">
+      </div>
+      <div class="modal-body">
+        <div class="text-center text-muted mb-4 mt-3" [innerHtml]="myPlan.List[showPlanIndex].context|safeHtml">
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

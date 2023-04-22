@@ -1,4 +1,5 @@
 <nav class="navbar navbar-expand-lg fixed-top navbar-transparent" color-on-scroll="100" id="navbar-top">
+    <asl-google-signin-button type='standard' size='large' logo_alignment="center"></asl-google-signin-button>
     <div class="container">
         <div class="navbar-translate">
             <a class="navbar-brand" placement="bottom" [routerLink]="['/home']" target="_blank"
@@ -68,12 +69,6 @@
                             <i class="tim-icons icon-single-02"> </i> Profile Page
                         </a>
                     </div>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link btn btn-default d-none d-lg-block" href="javascript:void(0)"
-                        (click)="scrollToDownload(target)">
-                        <i class="tim-icons icon-cloud-download-93"> </i> Download
-                    </a>
                 </li>
             </ul>
         </div>

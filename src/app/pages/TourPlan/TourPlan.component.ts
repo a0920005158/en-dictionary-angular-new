@@ -1,16 +1,11 @@
 import { PlacesService } from '../../service/places.service';
-import { Component, OnInit, HostListener } from '@angular/core';
-import noUiSlider from "nouislider";
-import { SpeechRecognitionService } from 'src/app/service/speech-recognition.service';
-import { AIConversationService } from 'src/app/service/ai-conversation.service';
-import { WordService } from 'src/app/service/word.service';
+import { Component, OnInit, HostListener, ElementRef, ViewChild } from '@angular/core';
 import { GoogleLoginProvider, SocialAuthService, SocialUser } from '@abacritt/angularx-social-login';
-import { WordSearch } from 'src/app/struct/WordSearch';
-import { AIConversation } from '../../struct/AIConversation';
 import { CityState, Place, PlaceResult, SearchCityState } from 'src/app/struct/CityState';
 import { AngularEditorConfig } from '@kolkov/angular-editor';
 import { LoginService } from "src/app/service/login.service";
-
+import { API_StoreTravelPlan_Response } from '../../api/structure/API_StoreTravelPlan';
+import * as htmlToPdf from 'html2pdf.js';
 
 @Component({
   selector: 'tour-plan',
@@ -67,11 +62,6 @@ export class TourPlanComponent implements OnInit {
   };
 
   trans = ["開車", "公共交通運輸"]
-  selfRole = ChatRole.自己;
-  robotRole = ChatRole.機器人;
-  recognitionText: string = "";
-  status: string = "開始辨識";
-  searchWord: string = "";
 
   transcript: string;
   isRecording: boolean;
@@ -87,9 +77,6 @@ export class TourPlanComponent implements OnInit {
   pagination = 3;
   pagination1 = 1;
   constructor(
-    private speechRecognitionService: SpeechRecognitionService,
-    private AIConversation: AIConversationService,
-    private wordService: WordService,
     private placesService: PlacesService,
     public LoginService: LoginService,
     private authService: SocialAuthService,
@@ -107,67 +94,12 @@ export class TourPlanComponent implements OnInit {
         this.LoginService.loggedIn = (user != null);
       });
     } else {
-      console.log('logined!!');
-      console.log(
-        this.LoginService.user
-      );
     }
   }
 
   ngOnDestroy() {
     var body = document.getElementsByTagName("body")[0];
     body.classList.remove("index-page");
-  }
-
-  startRecognition() {
-    if (this.status == "開始辨識") {
-      this.status = "顯示辨識結果";
-      this.speechRecognitionService.start().subscribe(
-        (text) => {
-          console.log('============');
-          console.log(text);
-
-          this.recognitionText += text;
-        },
-        (err) => {
-          console.error(err);
-          this.status = "開始辨識";
-        },
-        () => {
-          console.log("complete!");
-        }
-      );
-    } else {
-      this.status = "開始辨識";
-      this.speechRecognitionService.stop()
-    }
-  }
-
-  stopRecording() {
-    this.speechRecognitionService.stop();
-  }
-
-  showConfig() {
-    // var msg = new SpeechSynthesisUtterance('Hello World');
-    // window.speechSynthesis.speak(msg);
-  }
-
-  AIConversationSend() {
-    this.AIConversation.sentMsg(this.recognitionText);
-    this.recognitionText = "";
-  }
-
-  get getChatRecord(): AIConversation[] {
-    return this.AIConversation.chatGPTRecord;
-  }
-
-  WordSearchResult!: WordSearch;
-  searchWordDefine() {
-    this.wordService.searchWord(
-      this.searchWord
-    ).subscribe(el => {
-      this.WordSearchResult = el;
-    });
   }
 
   get cityState(): CityState[] {
@@ -217,9 +149,8 @@ export class TourPlanComponent implements OnInit {
     return this.placesService.isLoading;
   }
 
-  isExportPlan = false;
-  exportPlan() {
-    this.isExportPlan = true;
+  set isLoading(val: boolean) {
+    this.placesService.isLoading = val;
   }
 
   get exportPlanDoc(): string {
@@ -238,11 +169,58 @@ export class TourPlanComponent implements OnInit {
     return false
   }
 
+  storePlanTitle = "";
   storePlan() {
     if (this.LoginService.loggedIn) {
-
+      this.isLoading = true;
+      this.placesService.storePlan(this.LoginService.user.idToken, this.storePlanTitle, this.exportPlanDoc).subscribe(
+        (res: API_StoreTravelPlan_Response) => {
+          if (res.errorCode == 0) {
+            this.clearPlan();
+            alert("儲存成功!");
+          } else {
+            alert("儲存失敗!");
+          }
+          this.isLoading = false;
+        },
+        (err) => {
+          alert("發生錯誤!");
+          this.isLoading = false;
+        }
+      );
     } else {
-      
+      alert("請登入Google帳號!");
     }
   }
+
+  @ViewChild('content') content: ElementRef;
+
+  isExportPlan = false;
+  exportPlan() {
+    const options = {
+      filename: 'example.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+    };
+
+    let styles = `
+      <head>
+        <style>
+        p {
+              color: #333;
+            }
+        </style>
+      </head>
+    `
+    const content = this.content.nativeElement;
+    htmlToPdf().set(options).from(styles + "<body>" + content.innerHTML + "</body>").save();
+  }
+
+  clearPlan() {
+    this.placesService.searchCityState = [new SearchCityState];
+    this.exportPlanDoc = "";
+    this.isExportPlan = false;
+  }
 }
+

@@ -7,12 +7,17 @@ import { ConfigService } from './config.service';
 import { map } from 'rxjs/operators';
 import { ApiCallService } from './api-call.service';
 import { API_Response } from '../api/structure/API_AITravelPlan';
+// import { resolve } from 'path';
+// import { error } from 'console';
+declare var google: any;
 
 @Injectable({
     providedIn: 'root'
 })
 
+
 export class PlacesService {
+    service = new google.maps.places.PlacesService(document.createElement('div'));
     private API_KEY = 'AIzaSyDjD2_-EGRNJ7xsioVE60TaGjiYhL3Zx88'; // 將YOUR_API_KEY替換為您自己的API金鑰
     public cityState: CityState[] = [];
     public searchCityState: SearchCityState[] = [];
@@ -58,28 +63,51 @@ export class PlacesService {
     }
 
 
-    searchLocalPlaces(location: string, keyword: string, type: PlaceType, nextToken: string = ""): Observable<any> {
-        let url = this.config.placesUrl + `textsearch/json?`;
+    searchLocalPlaces(location: string, keyword: string, type: PlaceType, nextToken: string = ""): Promise<any> {
+        return new Promise((resolve, error) => {
+            this.service.textSearch({
+                query: `${keyword}+in+${location}`,
+                // location: location,
+                location: new google.maps.LatLng(23.69781, 120.960515),
+                radius: 1000,
+                type: type
+            }, (results: any[], status: string, pagination: any) => {
+                if (status === 'OK') {
+                    // 獲取到商家的資訊，處理商家資訊
+                    if (nextToken != "") {
+                        pagination.nextPage();
+                    }
+                    let nextPageToken = pagination.hasNextPage ? pagination.nextPage() : '';
+                    resolve({
+                        results:results,
+                        next_page_token: nextPageToken
+                    });
+                } else {
+                    error('搜索商家失敗，狀態：');
+                }
+            });
+        })
 
-        if (type !== PlaceType.全部) {
-            url += `&type=${type}`;
-        }
-        url += `query=${keyword}+in+${location}`;
+        // let url = this.config.placesUrl + `textsearch/json?`;
 
-        if (nextToken != "") {
-            url += `&pagetoken=${nextToken}`;
-        }
+        // if (type !== PlaceType.全部) {
+        //     url += `&type=${type}`;
+        // }
+        // url += `query=${keyword}+in+${location}`;
 
-        url += `&key=${this.API_KEY}`
-        return this.ajax.get(url).pipe(
-            map((response: any) => response)
-        );
+        // if (nextToken != "") {
+        //     url += `&pagetoken=${nextToken}`;
+        // }
+
+        // url += `&key=${this.API_KEY}`
+        // return this.ajax.get(url).pipe(
+        //     map((response: any) => response)
+        // );
     }
 
     attractionsScroll(searchPos: string) {
         let next_page_token = this.attractionsInf[searchPos].next_page_token;
-        this.searchLocalPlaces(searchPos, "景點", PlaceType.全部, next_page_token).subscribe((res: Place) => {
-            let test = this.attractionsInf[searchPos];
+        this.searchLocalPlaces(searchPos, "景點", PlaceType.全部, next_page_token).then((res: Place) => {
             this.attractionsInf[searchPos].next_page_token = res.next_page_token;
             res.results.forEach(el => {
                 this.attractionsInf[searchPos].results.push(el);
@@ -88,7 +116,7 @@ export class PlacesService {
     }
 
     foodsScroll(searchPos: string) {
-        this.searchLocalPlaces(searchPos, "美食", PlaceType.全部, this.foodInf[searchPos].next_page_token).subscribe((res: Place) => {
+        this.searchLocalPlaces(searchPos, "美食", PlaceType.全部, this.foodInf[searchPos].next_page_token).then((res: Place) => {
             this.foodInf[searchPos].next_page_token = res.next_page_token;
             res.results.forEach(el => {
                 this.foodInf[searchPos].results.push(el);
@@ -108,7 +136,7 @@ export class PlacesService {
         let selectSate = el.selectSate == -1 ? LibRandom.randomIndex(this.cityState[selectCity].State) : el.selectSate;
         let city = this.cityState[selectCity].cnName;
         let state = this.cityState[selectCity].State[selectSate].cnName;
-        let searchPos = el.selectCity == -1 ? city : city + " " + state
+        let searchPos = (el.selectCity == -1 || el.selectSate == -1) ? city : city + " " + state
         // let sd = this.dateRange[0].getFullYear() + "年" + (this.dateRange[0].getMonth() + 1) + "月" + this.dateRange[0].getDate() + "日";
         // let ed = this.dateRange[1].getFullYear() + "年" + (this.dateRange[1].getMonth() + 1) + "月" + this.dateRange[1].getDate() + "日";
         // let time = sd + "~" + ed;
@@ -187,11 +215,15 @@ export class PlacesService {
 
                         let planTem = res.choices[0].text;
                         attractionsChecked.forEach(ael => {
+                            console.log("===ael===");
+                            console.log(ael);
                             const regex = new RegExp(ael.name, 'g');
                             planTem = planTem.replace(regex, '<a target="_blank" href="https://www.google.com/maps/search/?api=1&query=' + ael.geometry.location.lat + ',' + ael.geometry.location.lng + '&query_place_id=' + ael.place_id + '">' + ael.name + '</a>');
                         })
 
                         foodsChecked.forEach(fel => {
+                            console.log("===ael===");
+                            console.log(fel);
                             const regex = new RegExp(fel.name, 'g');
                             planTem = planTem.replace(regex, '<a target="_blank" href="https://www.google.com/maps/search/?api=1&query=' + fel.geometry.location.lat + ',' + fel.geometry.location.lng + '&query_place_id=' + fel.place_id + '">' + fel.name + '</a>');
                         })
@@ -206,7 +238,8 @@ export class PlacesService {
                 }
             },
             (err) => {
-
+                alert("發生錯誤，請稍後再試!");
+                _this.isLoading = false;
             }
         );
     }
@@ -218,6 +251,53 @@ export class PlacesService {
                 food: foods,
                 attractions: attractions,
                 trans: trans
+            }
+        );
+    }
+
+    //儲存會員旅遊計畫
+    storePlan(idToken: string, title: string, context: string) {
+        return this.apiCallService.StoreTravelPlan.call(
+            {
+                idToken: idToken,
+                title: title,
+                context: context,
+            }
+        );
+    }
+
+    //儲存會員旅遊計畫
+    getPlan(idToken: string, pg: number) {
+        return this.apiCallService.GetTravelPlan.call(
+            {
+                idToken: idToken,
+                pg: pg
+            }
+        );
+    }
+
+    releasePlan(idToken: string, pid: number) {
+        return this.apiCallService.ReleaseTravelPlan.call(
+            {
+                idToken: idToken,
+                pid: pid
+            }
+        );
+    }
+
+    deletePlan(idToken: string, pid: number) {
+        return this.apiCallService.DeleteTravelPlan.call(
+            {
+                idToken: idToken,
+                pid: pid
+            }
+        );
+    }
+
+    getAllPlan(pg: number) {
+        return this.apiCallService.GetAllTravelPlan.call(
+            {
+                pg: pg
             }
         );
     }
