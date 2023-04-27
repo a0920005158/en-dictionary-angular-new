@@ -244,7 +244,7 @@ export class TourPlanComponent implements OnInit {
 
   checkedPlan: PlaceResult[] = []
   selectPlan(item: PlaceResult) {
-    if (this.checkedPlan.length >= 6) {
+    if (this.checkedPlan.length >= 9) {
       alert("超出九個選項限制!")
     } else {
       let index = this.checkedPlan.map(x => x.place_id).indexOf(item.place_id)
