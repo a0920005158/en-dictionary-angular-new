@@ -130,8 +130,15 @@
                                     </label>
                                 </div>
                             </div>
-                            <div class="form-group col-md-5">選擇{{item.searchPos}}景點</div>
-                            <div class="form-group col-md-5">選擇{{item.searchPos}}美食</div>
+                            <div class="form-group col-md-10">目前設定地點:{{item.searchPos}}</div>
+                            <!-- <div class="form-group col-md-5">選擇{{item.searchPos}}景點</div>
+                            <div class="form-group col-md-5">選擇{{item.searchPos}}美食</div> -->
+
+                            <div class="form-group col-md-10">
+                                <span *ngFor="let item of checkedPlan" class="badge badge-primary">
+                                    {{item.name}}
+                                </span>
+                            </div>
 
                             <div class="form-group col-md-5">
                                 <div class="form-check">
@@ -157,84 +164,167 @@
                                     </label>
                                 </div>
                             </div>
+                            <div class="form-group col-md-10">
+                                <tabset class="nav-tabs-danger">
+                                    <tab>
+                                        <ng-template tabHeading>
+                                            <i class="tim-icons icon-spaceship"> </i> 挑選景點
+                                        </ng-template>
+                                        <div style="display: flex;">
+                                            <div style="flex:1;height: 300px;overflow-y: auto;">
+                                                <table class="table"
+                                                    *ngIf="attractionsInf.hasOwnProperty(item.searchPos)">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center">Add</th>
+                                                            <!-- <th class="text-center">Checked</th> -->
+                                                            <th>Name</th>
+                                                            <th class="text-right">Stars</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr
+                                                            *ngFor="let aitem of attractionsInf[item.searchPos].results;index as ai">
+                                                            <td class="text-center">
+                                                                <button (click)="selectPlan(aitem)"
+                                                                    class="btn btn-primary btn-sm">添加行程</button>
+                                                            </td>
+                                                            <!-- <td class="text-center">
+                                                                <input
+                                                                    [disabled]="item.isAttractionsRandom || (getCheckedCount(attractionsInf[item.searchPos].results)&&!aitem.checked)"
+                                                                    [(ngModel)]="aitem.checked" class="form-check-input"
+                                                                    type="checkbox">
+                                                            </td> -->
+                                                            <td class="text-left">
+                                                                <button class="btn btn-default btn-sm mr-1"
+                                                                    container="body" placement="bottom"
+                                                                    [popoverTitle]="aitem.name"
+                                                                    [popover]="aitem.formatted_address" type="button">
+                                                                    {{aitem.name}}
+                                                                </button>
+                                                            </td>
+                                                            <td>
+                                                                {{aitem.rating}}
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="td-actions text-center" colspan="3">
+                                                                <button (click)="onAttractionsScroll(item.searchPos)"
+                                                                    type="button"
+                                                                    class="btn btn-success btn-sm">加載更多資訊...</button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div style="flex:1;height: 300px;overflow-y: auto;">
+                                                <table class="table" *ngIf="foodInf.hasOwnProperty(item.searchPos)">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center">Add</th>
+                                                            <!-- <th class="text-center">Checked</th> -->
+                                                            <th>Name</th>
+                                                            <th class="text-right">Stars</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr
+                                                            *ngFor="let fitem of foodInf[item.searchPos].results;index as ai">
+                                                            <td class="text-center">
+                                                                <button (click)="selectPlan(fitem)"
+                                                                    class="btn btn-primary btn-sm">添加行程</button>
+                                                            </td>
+                                                            <!-- <td class="text-center">
+                                                                <input
+                                                                    [disabled]="item.isFoodRandom|| (getCheckedCount(foodInf[item.searchPos].results)&&!fitem.checked)"
+                                                                    [(ngModel)]="fitem.checked" class="form-check-input"
+                                                                    type="checkbox">
+                                                            </td> -->
+                                                            <td class="text-left">
+                                                                <button class="btn btn-default btn-sm mr-1"
+                                                                    container="body" placement="bottom"
+                                                                    [popoverTitle]="fitem.name"
+                                                                    [popover]="fitem.formatted_address" type="button">
+                                                                    {{fitem.name}}
+                                                                </button>
+                                                            </td>
+                                                            <td>
+                                                                {{fitem.rating}}
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="td-actions text-center" colspan="3">
+                                                                <button (click)="onFoodsScroll(item.searchPos)"
+                                                                    type="button"
+                                                                    class="btn btn-success btn-sm">加載更多資訊...</button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </tab>
+                                    <tab>
+                                        <ng-template tabHeading>
+                                            <i class="tim-icons icon-settings-gear-63"> </i> 搜尋景點
+                                        </ng-template>
+                                        <div class="form-group">
+                                            <label for="searchA">搜尋景點</label>
+                                            <input [(ngModel)]="searchKeyWord" type="text" class="form-control"
+                                                id="searchA" placeholder="搜尋景點">
+                                        </div>
 
-                            <div class="form-group col-md-5" style="height: 300px;overflow-y: auto;">
-                                <table class="table" *ngIf="attractionsInf.hasOwnProperty(item.searchPos)">
-                                    <thead>
-                                        <tr>
-                                            <th class="text-center">Checked</th>
-                                            <th>Name</th>
-                                            <th class="text-right">Stars</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr *ngFor="let aitem of attractionsInf[item.searchPos].results;index as ai">
-                                            <td class="text-center">
-                                                <input
-                                                    [disabled]="item.isAttractionsRandom || (getCheckedCount(attractionsInf[item.searchPos].results)&&!aitem.checked)"
-                                                    [(ngModel)]="aitem.checked" class="form-check-input"
-                                                    type="checkbox">
-                                            </td>
-                                            <td class="text-left">
-                                                <button class="btn btn-default btn-sm mr-1" container="body"
-                                                    placement="bottom" [popoverTitle]="aitem.name"
-                                                    [popover]="aitem.formatted_address" type="button">
-                                                    {{aitem.name}}
-                                                </button>
-                                            </td>
-                                            <td>
-                                                {{aitem.rating}}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="td-actions text-center" colspan="3">
-                                                <button (click)="onAttractionsScroll(item.searchPos)" type="button"
-                                                    class="btn btn-success btn-sm">加載更多資訊...</button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                        <button (click)="searchPlaces(searchKeyWord)" type="submit"
+                                            class="btn btn-primary">搜尋</button>
+                                        <div style="flex:1;height: 300px;overflow-y: auto;">
+                                            <table class="table" *ngIf="searchInf.hasOwnProperty(item.searchPos)">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-center">Add</th>
+                                                        <!-- <th class="text-center">Checked</th> -->
+                                                        <th>Name</th>
+                                                        <th class="text-right">Stars</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr
+                                                        *ngFor="let sitem of searchInf[item.searchPos].results;index as ai">
+                                                        <td class="text-center">
+                                                            <button (click)="selectPlan(sitem)"
+                                                                class="btn btn-primary btn-sm">添加行程</button>
+                                                        </td>
+                                                        <!-- <td class="text-center">
+                                                            <input
+                                                                [disabled]="item.isAttractionsRandom || (getCheckedCount(attractionsInf[item.searchPos].results)&&!sitem.checked)"
+                                                                [(ngModel)]="sitem.checked" class="form-check-input"
+                                                                type="checkbox">
+                                                        </td> -->
+                                                        <td class="text-left">
+                                                            <button class="btn btn-default btn-sm mr-1" container="body"
+                                                                placement="bottom" [popoverTitle]="sitem.name"
+                                                                [popover]="sitem.formatted_address" type="button">
+                                                                {{sitem.name}}
+                                                            </button>
+                                                        </td>
+                                                        <td>
+                                                            {{sitem.rating}}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="td-actions text-center" colspan="3">
+                                                            <button (click)="onAttractionsScroll(item.searchPos)"
+                                                                type="button"
+                                                                class="btn btn-success btn-sm">加載更多資訊...</button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </tab>
+                                </tabset>
                             </div>
 
-                            <div class="form-group col-md-5" style="height: 300px;overflow-y: auto;">
-                                <table class="table" *ngIf="foodInf.hasOwnProperty(item.searchPos)">
-                                    <thead>
-                                        <tr>
-                                            <th class="text-center">Checked</th>
-                                            <th>Name</th>
-                                            <th class="text-right">Stars</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr *ngFor="let fitem of foodInf[item.searchPos].results;index as ai">
-                                            <td class="text-center">
-                                                <input
-                                                    [disabled]="item.isFoodRandom|| (getCheckedCount(foodInf[item.searchPos].results)&&!fitem.checked)"
-                                                    [(ngModel)]="fitem.checked" class="form-check-input"
-                                                    type="checkbox">
-                                            </td>
-                                            <td class="text-left">
-                                                <button class="btn btn-default btn-sm mr-1" container="body"
-                                                    placement="bottom" [popoverTitle]="fitem.name"
-                                                    [popover]="fitem.formatted_address" type="button">
-                                                    {{fitem.name}}
-                                                </button>
-                                            </td>
-                                            <td>
-                                                {{fitem.rating}}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="td-actions text-center" colspan="3">
-                                                <button (click)="onFoodsScroll(item.searchPos)" type="button"
-                                                    class="btn btn-success btn-sm">加載更多資訊...</button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <button (click)="tranvePlan(item.searchPos)" type="submit"
+                            <button (click)="tranvePlanNew(item.searchPos)" type="submit"
                                 class="btn btn-primary form-group col-md-10">產生第{{ii+1}}天行程</button>
                         </ng-container>
                         <!-- </ng-template> -->
@@ -292,9 +382,9 @@
         <div class="modal-content">
             <div class="modal-body">
                 <div class="form-group">
-                    <label for="exampleInputEmail1">輸入標題</label>
-                    <input [(ngModel)]="storePlanTitle" type="email" class="form-control" id="exampleInputEmail1"
-                        aria-describedby="emailHelp" placeholder="輸入標題">
+                    <label for="InputTitle">輸入標題</label>
+                    <input [(ngModel)]="storePlanTitle" type="text" class="form-control" id="InputTitle"
+                        placeholder="輸入標題">
                 </div>
                 <button type="submit" class="btn btn-primary" (click)="myModal2.hide();storePlan();">儲存</button>
             </div>

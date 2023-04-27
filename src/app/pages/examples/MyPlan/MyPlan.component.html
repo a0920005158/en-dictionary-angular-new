@@ -141,9 +141,22 @@
       <div class="modal-header justify-content-center">
       </div>
       <div class="modal-body">
-        <div class="text-center text-muted mb-4 mt-3" [innerHtml]="myPlan.List[showPlanIndex].context|safeHtml">
-
-        </div>
+        <ng-container *ngIf="!isEditmyPlan;else showMyPlan">
+          <button [hidden]="" (click)="isEditmyPlan = true;" type="submit" class="btn btn-primary btn-sm">編輯</button>
+          <div class="text-center text-muted mb-4 mt-3">
+            {{myPlan.List[showPlanIndex].title}}
+          </div>
+          <div class="text-center text-muted mb-4 mt-3" [innerHtml]="myPlan.List[showPlanIndex].context|safeHtml"></div>
+        </ng-container>
+        <ng-template #showMyPlan>
+          <button [hidden]="" (click)="editMyPlan()" type="submit" class="btn btn-primary btn-sm">儲存</button>
+          <button [hidden]="" (click)="getPlan(0);isEditmyPlan=false" type="submit" class="btn btn-primary btn-sm">取消</button>
+          <br>
+          <label for="myTitle">標題</label>
+          <input [(ngModel)]="myPlan.List[showPlanIndex].title" type="text" class="form-control" id="myTitle"
+            placeholder="標題">
+          <angular-editor [(ngModel)]="myPlan.List[showPlanIndex].context" [config]="config"></angular-editor>
+        </ng-template>
       </div>
     </div>
   </div>

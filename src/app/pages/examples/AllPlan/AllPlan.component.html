@@ -61,6 +61,7 @@
                         <th>標題</th>
                         <th>分享會員</th>
                         <th>發布時間</th>
+                        <th>星數</th>
                         <!-- <th class="text-right">操作</th> -->
                       </tr>
                     </thead>
@@ -68,12 +69,15 @@
                       <tr *ngFor="let item of myPlan.List; let i=index">
                         <td>
                           <button class="btn btn-success" data-target="#myModal2"
-                            (click)="showPlanIndex=i;myModal2.show()">
+                            (click)="showPlanIndex=i;getComment();myModal2.show()">
                             {{item.title}}
                           </button>
                         </td>
                         <td>{{item.acc}}</td>
                         <td>{{item.updated_at}}</td>
+                        <td>
+                          <rating [(ngModel)]="item.stars" [max]="5" [readonly]="true" [titles]="['one','two','three','four']"></rating>
+                        </td>
                         <!-- <td class="td-actions text-right">
                           <button *ngIf="!item.isOp" (click)="releasePlan(item.id)" type="button" rel="tooltip"
                             class="btn btn-primary">發布
@@ -144,6 +148,41 @@
       <div class="modal-body">
         <div class="text-center text-muted mb-4 mt-3" [innerHtml]="myPlan.List[showPlanIndex].context|safeHtml">
 
+        </div>
+
+
+        <ng-container *ngIf="selfComment==null&&myPlan.List[this.showPlanIndex].email!=LoginService.user.email">
+          <div class="form-group">
+            <label for="exampleInputEmail1">給予評論與星星鼓勵</label>
+            <textarea [(ngModel)]="comment" id="text-body" name="w3review">
+          </textarea>
+            <br>
+            <rating [(ngModel)]="rate" [max]="5" [readonly]="false" [titles]="['one','two','three','four']"></rating>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-sm" (click)="sentComment()">送出評論</button>
+        </ng-container>
+
+        <div *ngIf="selfComment!=null" class="text-left text-muted mb-4 mt-3">
+          <div style="border-bottom: solid;">
+            <span> {{selfComment.acc}}:&nbsp;{{selfComment.comment}}</span>&nbsp;&nbsp;&nbsp;
+            <rating [(ngModel)]="selfComment.stars" [max]="5" [readonly]="true" [titles]="['one','two','three','four']">
+            </rating>
+          </div>
+        </div>
+
+        <div class="text-left text-muted mb-4 mt-3">
+          <div style="border-bottom: solid;" *ngFor="let ci of showPlanComment.List">
+            <span> {{ci.comment_acc}}:&nbsp;{{ci.comment}}</span>&nbsp;&nbsp;&nbsp;
+            <rating [(ngModel)]="ci.stars" [max]="5" [readonly]="true" [titles]="['one','two','three','four']">
+            </rating>
+          </div>
+
+          <nav aria-label="Page navigation example" *ngIf="showPlanComment.pg.amount>0">
+            <pagination [(ngModel)]="showPlanComment.pg.current" [totalItems]="showPlanComment.pg.pagesize"
+              (ngModelChange)="getAllComment($event)">
+            </pagination>
+          </nav>
         </div>
       </div>
     </div>

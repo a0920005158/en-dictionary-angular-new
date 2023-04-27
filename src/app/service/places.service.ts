@@ -1,4 +1,4 @@
-import { CityState, SearchCityState, Place } from './../struct/CityState';
+import { CityState, SearchCityState, Place, PlaceResult } from './../struct/CityState';
 import { Injectable } from '@angular/core';
 import { AjaxService } from './ajax.service';
 import { Observable, forkJoin } from 'rxjs';
@@ -79,7 +79,7 @@ export class PlacesService {
                     }
                     let nextPageToken = pagination.hasNextPage ? pagination.nextPage() : '';
                     resolve({
-                        results:results,
+                        results: results,
                         next_page_token: nextPageToken
                     });
                 } else {
@@ -127,7 +127,18 @@ export class PlacesService {
     attractionsInf: { [key: string]: Place } = {};
     hotelInf: { [key: string]: Place } = {};
     foodInf: { [key: string]: Place } = {};
+    searchInf: { [key: string]: Place } = {};
     dateRange?: Date[];
+    searchPlaces(searchKeyWord: string) {
+        let el = this.searchCityState[this.searchCityState.length - 1];
+        let searchPos = el.searchPos
+        this.searchLocalPlaces(searchPos, searchKeyWord, PlaceType.全部).then((el: Place) => {
+            this.searchInf[searchPos] = el;
+            this.searchInf[searchPos].results.forEach(el => {
+                el["checked"] = false;
+            })
+        })
+    }
 
     searchSelectLocalPlaces() {
         let el = this.searchCityState[this.searchCityState.length - 1];
@@ -206,31 +217,97 @@ export class PlacesService {
         _this.foodInf[searchPos].results = _this.foodInf[searchPos].results.filter(inf => inf.checked == false)
         _this.isLoading = true;
         _this.travelPlanCall(attractions, foods, trans).subscribe(
+            {
+                next: (res: API_Response) => {
+                    if (res.error != undefined) {
+
+                    } else {
+                        if (res.choices.length > 0) {
+
+
+                            let planTem = res.choices[0].text;
+                            attractionsChecked.forEach(ael => {
+                                // console.log("===ael===");
+                                // console.log(ael);
+                                const regex = new RegExp(ael.name, 'g');
+                                planTem = planTem.replace(regex, '<a target="_blank" href="https://www.google.com/maps/search/?api=1&query=' + ael.geometry.location.lat + ',' + ael.geometry.location.lng + '&query_place_id=' + ael.place_id + '">' + ael.name + '</a>');
+                            })
+
+                            foodsChecked.forEach(fel => {
+                                // console.log("===ael===");
+                                // console.log(fel);
+                                const regex = new RegExp(fel.name, 'g');
+                                planTem = planTem.replace(regex, '<a target="_blank" href="https://www.google.com/maps/search/?api=1&query=' + fel.geometry.location.lat + ',' + fel.geometry.location.lng + '&query_place_id=' + fel.place_id + '">' + fel.name + '</a>');
+                            })
+                            searchForm.plan = planTem;
+                            if (_this.exportPlanDoc != "")
+                                _this.exportPlanDoc += "<br>"
+                            _this.exportPlanDoc += planTem;
+                        }
+
+                        _this.isLoading = false;
+
+                    }
+                },
+                error: (error) => {
+                    alert("發生錯誤，請稍後再試!");
+                    _this.isLoading = false;
+                },
+                complete: () => {
+                }
+            }
+        );
+    }
+
+    tranvePlanNew(searchPos: string, checkedPlan: PlaceResult[]) {
+        let _this = this;
+        let searchForm = this.searchCityState[this.searchCityState.length - 1];
+        let trans = this.searchCityState[this.searchCityState.length - 1].trans;
+        let attractions = "";
+        let planPlace = [];
+
+        if (searchForm.isAttractionsRandom || searchForm.isFoodRandom) {
+            let randomCount = LibRandom.getRandomNumberInRange(3, 5);
+            let arrTemp = LibRandom.getRandomNumbersInRange(0, _this.attractionsInf[searchPos].results.length - 1, randomCount);
+            arrTemp.forEach(el => {
+                planPlace.push(_this.attractionsInf[searchPos].results[el]);
+            })
+
+            let randomCount2 = LibRandom.getRandomNumberInRange(3, 5);
+            let arrTemp2 = LibRandom.getRandomNumbersInRange(0, _this.foodInf[searchPos].results.length - 1, randomCount2);
+            arrTemp2.forEach(el => {
+                planPlace.push(_this.foodInf[searchPos].results[el]);
+            })
+        }
+
+        checkedPlan.forEach(el => {
+            planPlace.push(el);
+        })
+
+        attractions = planPlace.map(x => x.name + " type:" + x.types[0] + " address:" + x.formatted_address).join(",");
+
+        if (attractions == "") {
+            alert("請選擇景點與美食!");
+            return;
+        }
+
+        _this.isLoading = true;
+        _this.travelPlanCall(attractions, "", trans).subscribe(
             (res: API_Response) => {
                 if (res.error != undefined) {
 
                 } else {
                     if (res.choices.length > 0) {
-
-
                         let planTem = res.choices[0].text;
-                        attractionsChecked.forEach(ael => {
-                            console.log("===ael===");
-                            console.log(ael);
+                        planPlace.forEach(ael => {
                             const regex = new RegExp(ael.name, 'g');
                             planTem = planTem.replace(regex, '<a target="_blank" href="https://www.google.com/maps/search/?api=1&query=' + ael.geometry.location.lat + ',' + ael.geometry.location.lng + '&query_place_id=' + ael.place_id + '">' + ael.name + '</a>');
                         })
 
-                        foodsChecked.forEach(fel => {
-                            console.log("===ael===");
-                            console.log(fel);
-                            const regex = new RegExp(fel.name, 'g');
-                            planTem = planTem.replace(regex, '<a target="_blank" href="https://www.google.com/maps/search/?api=1&query=' + fel.geometry.location.lat + ',' + fel.geometry.location.lng + '&query_place_id=' + fel.place_id + '">' + fel.name + '</a>');
-                        })
                         searchForm.plan = planTem;
                         if (_this.exportPlanDoc != "")
                             _this.exportPlanDoc += "<br>"
-                        _this.exportPlanDoc += planTem;
+                        _this.exportPlanDoc += (searchPos + planTem);
                     }
 
                     _this.isLoading = false;
@@ -243,7 +320,6 @@ export class PlacesService {
             }
         );
     }
-
 
     travelPlanCall(attractions: string, foods: string, trans: string): Observable<any> {
         return this.apiCallService.AITravelPlan.call(
@@ -294,9 +370,49 @@ export class PlacesService {
         );
     }
 
+    modifyPlan(idToken: string, pid: number, title: string, context: string) {
+        return this.apiCallService.ModifyTravelPlan.call(
+            {
+                idToken: idToken,
+                pid: pid,
+                title: title,
+                context: context
+            }
+        );
+    }
+
     getAllPlan(pg: number) {
         return this.apiCallService.GetAllTravelPlan.call(
             {
+                pg: pg
+            }
+        );
+    }
+
+    commentPlan(idToken: string, pid: number, comment: string, stars: number) {
+        return this.apiCallService.CommentTravelPlan.call(
+            {
+                idToken: idToken,
+                pid: pid,
+                comment: comment,
+                stars: stars
+            }
+        );
+    }
+
+    getCommentPlan(idToken: string, pid: number) {
+        return this.apiCallService.GetCommentTravelPlan.call(
+            {
+                idToken: idToken,
+                pid: pid,
+            }
+        );
+    }
+
+    getAllComment(pid: number, pg: number) {
+        return this.apiCallService.GetAllCommentTravelPlan.call(
+            {
+                pid: pid,
                 pg: pg
             }
         );

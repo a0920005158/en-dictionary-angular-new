@@ -19,11 +19,6 @@ export class AjaxService {
 
   get(url: string, hearder: HttpHeaders = new HttpHeaders) {
     return this.httpClient.get(url, { headers: hearder });
-    // return new Observable(observer => {
-    //   this.httpClient.get(url, { headers: hearder }).subscribe(res => {
-    //     observer.next(res);
-    //   });
-    // });
   }
 
   post<T>(url: string, data: T) {
@@ -43,12 +38,18 @@ export class AjaxService {
   apiCall<T>(api: API_Base): Observable<T> {
     let apiPath = this.config.apiPath
     return new Observable(observer => {
-      this.httpClient.post<any>(apiPath + api.getApiPath(), api.getParameter(), this.httpOptions).subscribe(res => {
-        observer.next(res);
-      },
-      error=>{
-        observer.error(error);
-      });
+      this.httpClient.post<any>(apiPath + api.getApiPath(), api.getParameter(), this.httpOptions).subscribe(
+        {
+          next: (res) => {
+            observer.next(res);
+          },
+          error: (error) => {
+            observer.error(error);
+          },
+          complete: () => {
+          }
+        }
+      );
     });
   }
 }

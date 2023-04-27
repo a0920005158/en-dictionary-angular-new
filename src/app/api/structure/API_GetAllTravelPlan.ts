@@ -34,7 +34,6 @@ export type API_GetAllTravelPlan_Response = {
   errorCode: number;
   errorMsg: string;
   result: API_GetTravelPlan_Result;
-
 }
 
 export type API_GetTravelPlan_Result = {

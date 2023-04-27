@@ -44,3 +44,15 @@ option {
     white-space: pre-wrap;
     word-wrap: break-word
 }
+
+#text-body {
+    height: 100%;
+    /*高度填充*/
+    width: 100%;
+    padding: 0;
+    /*防止textarea超過td邊框*/
+    vertical-align: bottom;
+    /*chrome的td有margin-top情況 用此CSS調整*/
+    border: none;
+    /*border用td的*/
+}

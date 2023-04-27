@@ -16,6 +16,7 @@ import { CarouselModule } from "ngx-bootstrap/carousel";
 import { ModalModule } from "ngx-bootstrap/modal";
 import { JwBootstrapSwitchNg2Module } from "jw-bootstrap-switch-ng2";
 import { PopoverModule } from "ngx-bootstrap/popover";
+import { RatingModule, RatingConfig } from 'ngx-bootstrap/rating';
 
 import { IndexComponent } from "./index/index.component";
 import { ProfilepageComponent } from "./examples/profilepage/profilepage.component";
@@ -56,6 +57,7 @@ import { GoogleLoginProvider, FacebookLoginProvider } from '@abacritt/angularx-s
     HttpClientModule,
     AngularEditorModule,
     SocialLoginModule,
+    RatingModule
   ],
   declarations: [
     IndexComponent,
@@ -84,6 +86,7 @@ import { GoogleLoginProvider, FacebookLoginProvider } from '@abacritt/angularx-s
     FilterCheckedPipe,
   ],
   providers: [
+    RatingConfig,
     {
       provide: 'SocialAuthServiceConfig',
       useValue: {

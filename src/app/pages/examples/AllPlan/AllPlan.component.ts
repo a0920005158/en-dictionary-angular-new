@@ -5,6 +5,8 @@ import { LoginService } from "src/app/service/login.service";
 import { SocialAuthService } from '@abacritt/angularx-social-login';
 import Chart from "chart.js";
 import { API_GetTravelPlan_Response } from "src/app/api/structure/API_GetTravelPlan";
+import { API_GetCommentPlan_Result, API_GetCommentTravelPlan_Response } from 'src/app/api/structure/API_GetCommentTravelPlan';
+import { API_GetAllCommentTravelPlan_Response, API_GetAllComment_Result } from 'src/app/api/structure/API_GetAllCommentTravelPlan';
 
 @Component({
   selector: "app-all-plan",
@@ -117,20 +119,109 @@ export class AllPlanComponent implements OnInit, OnDestroy {
   getAllPlan(pg: number) {
     this.isLoading = true;
     this.placesService.getAllPlan(pg).subscribe(
-      (res: API_GetTravelPlan_Response) => {
-        if (res.errorCode == 0) {
-          this.myPlan = res.result;
-        } else {
+      {
+        next: (res: API_GetTravelPlan_Response) => {
+          if (res.errorCode == 0) {
+            this.myPlan = res.result;
+          } else {
+            alert("發生錯誤!");
+          }
+          this.isLoading = false;
+        },
+        error: (error) => {
           alert("發生錯誤!");
+          this.isLoading = false;
+        },
+        complete: () => {
         }
-        this.isLoading = false;
-      },
-      (err) => {
-        alert("發生錯誤!");
-        this.isLoading = false;
       }
     );
   }
 
   showPlanIndex: number = 0
+  rate: number = 0
+  comment: string = ""
+  selfComment!: API_GetCommentPlan_Result;
+
+  sentComment() {
+    this.isLoading = true;
+    this.placesService.commentPlan(
+      this.LoginService.user.idToken,
+      this.myPlan.List[this.showPlanIndex].id,
+      this.comment,
+      this.rate
+    ).subscribe(
+      {
+        next: (res: API_GetTravelPlan_Response) => {
+          if (res.errorCode == 0) {
+            alert("評論成功!");
+            this.getComment();
+            this.comment = "";
+            this.rate = 0;
+          } else {
+            alert("發生錯誤!");
+          }
+          this.isLoading = false;
+        },
+        error: (error) => {
+          alert("發生錯誤!");
+          this.isLoading = false;
+        },
+        complete: () => {
+        }
+      }
+    );
+  }
+
+  getComment() {
+    this.isLoading = true;
+    this.placesService.getCommentPlan(
+      this.LoginService.user.idToken,
+      this.myPlan.List[this.showPlanIndex].id
+    ).subscribe(
+      {
+        next: (res: API_GetCommentTravelPlan_Response) => {
+          if (res.errorCode == 0) {
+            this.selfComment = res.result;
+          } else {
+            alert("發生錯誤!");
+          }
+          
+          this.getAllComment(0)
+          this.isLoading = false;
+        },
+        error: (error) => {
+          alert("發生錯誤!");
+          this.isLoading = false;
+        },
+        complete: () => {
+        }
+      }
+    );
+  }
+
+  showPlanComment: API_GetAllComment_Result = {
+    List: [],
+    pg: {
+      current: 0,
+      amount: 0,
+      pagesize: 0
+    }
+  };
+
+  getAllComment(pg: number) {
+    this.placesService.getAllComment(this.myPlan.List[this.showPlanIndex].id, pg).subscribe(
+      {
+        next: (res: API_GetAllCommentTravelPlan_Response) => {
+          if (res.errorCode == 0) {
+            this.showPlanComment = res.result;
+          }
+        },
+        error: (error) => {
+        },
+        complete: () => {
+        }
+      }
+    );
+  }
 }

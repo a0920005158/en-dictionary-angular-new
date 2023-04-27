@@ -5,6 +5,7 @@ import { LoginService } from "src/app/service/login.service";
 import { SocialAuthService } from '@abacritt/angularx-social-login';
 import Chart from "chart.js";
 import { API_GetTravelPlan_Response } from "src/app/api/structure/API_GetTravelPlan";
+import { AngularEditorConfig } from '@kolkov/angular-editor';
 
 @Component({
   selector: "app-my-plan",
@@ -16,6 +17,35 @@ export class MyPlanComponent implements OnInit, OnDestroy {
   focus;
   focus1;
   focus2;
+  config: AngularEditorConfig = {
+    editable: true,
+    spellcheck: true,
+    height: '15rem',
+    minHeight: '5rem',
+    placeholder: 'Enter text here...',
+    translate: 'no',
+    defaultParagraphSeparator: 'p',
+    defaultFontName: 'Arial',
+    toolbarHiddenButtons: [
+      ['bold']
+    ],
+    customClasses: [
+      {
+        name: "quote",
+        class: "quote",
+      },
+      {
+        name: 'redText',
+        class: 'redText'
+      },
+      {
+        name: "titleText",
+        class: "titleText",
+        tag: "h1",
+      },
+    ]
+  };
+
   constructor(private placesService: PlacesService, public LoginService: LoginService, private authService: SocialAuthService,) {
 
   }
@@ -116,17 +146,21 @@ export class MyPlanComponent implements OnInit, OnDestroy {
   getPlan(pg: number) {
     this.isLoading = true;
     this.placesService.getPlan(this.LoginService.user.idToken, pg).subscribe(
-      (res: API_GetTravelPlan_Response) => {
-        if (res.errorCode == 0) {
-          this.myPlan = res.result;
-        } else {
+      {
+        next: (res: API_GetTravelPlan_Response) => {
+          if (res.errorCode == 0) {
+            this.myPlan = res.result;
+          } else {
+            alert("發生錯誤!");
+          }
+          this.isLoading = false;
+        },
+        error: (error) => {
           alert("發生錯誤!");
+          this.isLoading = false;
+        },
+        complete: () => {
         }
-        this.isLoading = false;
-      },
-      (err) => {
-        alert("發生錯誤!");
-        this.isLoading = false;
       }
     );
   }
@@ -136,18 +170,22 @@ export class MyPlanComponent implements OnInit, OnDestroy {
   releasePlan(pid: number) {
     this.isLoading = true;
     this.placesService.releasePlan(this.LoginService.user.idToken, pid).subscribe(
-      (res: API_GetTravelPlan_Response) => {
-        if (res.errorCode == 0) {
-          let index = this.myPlan.List.map(x => x.id).indexOf(pid);
-          this.myPlan.List[index].isOp = this.myPlan.List[index].isOp ? 0 : 1;
-        } else {
+      {
+        next: (res: API_GetTravelPlan_Response) => {
+          if (res.errorCode == 0) {
+            let index = this.myPlan.List.map(x => x.id).indexOf(pid);
+            this.myPlan.List[index].isOp = this.myPlan.List[index].isOp ? 0 : 1;
+          } else {
+            alert("發生錯誤!");
+          }
+          this.isLoading = false;
+        },
+        error: (error) => {
           alert("發生錯誤!");
+          this.isLoading = false;
+        },
+        complete: () => {
         }
-        this.isLoading = false;
-      },
-      (err) => {
-        alert("發生錯誤!");
-        this.isLoading = false;
       }
     );
   }
@@ -157,17 +195,51 @@ export class MyPlanComponent implements OnInit, OnDestroy {
   deletePlan(pid: number) {
     this.isLoading = true;
     this.placesService.deletePlan(this.LoginService.user.idToken, pid).subscribe(
-      (res: API_GetTravelPlan_Response) => {
-        if (res.errorCode == 0) {
-          this.getPlan(0);
-        } else {
+      {
+        next: (res: API_GetTravelPlan_Response) => {
+          if (res.errorCode == 0) {
+            this.getPlan(0);
+          } else {
+            alert("發生錯誤!");
+          }
+          this.isLoading = false;
+        },
+        error: (error) => {
           alert("發生錯誤!");
+          this.isLoading = false;
+        },
+        complete: () => {
         }
-        this.isLoading = false;
-      },
-      (err) => {
-        alert("發生錯誤!");
-        this.isLoading = false;
+      }
+    );
+  }
+
+  isEditmyPlan = false
+  editMyPlan() {
+    this.isEditmyPlan = true;
+    this.isLoading = true;
+    this.placesService.modifyPlan(
+      this.LoginService.user.idToken,
+      this.myPlan.List[this.showPlanIndex].id,
+      this.myPlan.List[this.showPlanIndex].title,
+      this.myPlan.List[this.showPlanIndex].context
+    ).subscribe(
+      {
+        next: (res: API_GetTravelPlan_Response) => {
+          if (res.errorCode == 0) {
+            alert("修改成功!");
+            this.getPlan(0);
+          } else {
+            alert("發生錯誤!");
+          }
+          this.isLoading = false;
+        },
+        error: (error) => {
+          alert("發生錯誤!");
+          this.isLoading = false;
+        },
+        complete: () => {
+        }
       }
     );
   }

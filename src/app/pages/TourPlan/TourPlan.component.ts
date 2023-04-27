@@ -1,3 +1,4 @@
+import { map } from 'rxjs/operators';
 import { PlacesService } from '../../service/places.service';
 import { Component, OnInit, HostListener, ElementRef, ViewChild } from '@angular/core';
 import { GoogleLoginProvider, SocialAuthService, SocialUser } from '@abacritt/angularx-social-login';
@@ -76,6 +77,7 @@ export class TourPlanComponent implements OnInit {
   date = new Date();
   pagination = 3;
   pagination1 = 1;
+  searchKeyWord: string = ""
   constructor(
     private placesService: PlacesService,
     public LoginService: LoginService,
@@ -117,8 +119,17 @@ export class TourPlanComponent implements OnInit {
   searchLocalPlaces() {
     this.placesService.searchSelectLocalPlaces();
   }
+
+  searchPlaces(searchKeyWord: string) {
+    this.placesService.searchPlaces(searchKeyWord);
+  }
+
   tranvePlan(searchPos: string) {
     this.placesService.tranvePlan(searchPos);
+  }
+
+  tranvePlanNew(searchPos: string) {
+    this.placesService.tranvePlanNew(searchPos, this.checkedPlan);
   }
 
   get dateRange(): Date[] {
@@ -135,6 +146,10 @@ export class TourPlanComponent implements OnInit {
 
   get foodInf(): { [key: string]: Place } {
     return this.placesService.foodInf;
+  }
+
+  get searchInf(): { [key: string]: Place } {
+    return this.placesService.searchInf;
   }
 
   onAttractionsScroll(searchPos: string) {
@@ -174,18 +189,22 @@ export class TourPlanComponent implements OnInit {
     if (this.LoginService.loggedIn) {
       this.isLoading = true;
       this.placesService.storePlan(this.LoginService.user.idToken, this.storePlanTitle, this.exportPlanDoc).subscribe(
-        (res: API_StoreTravelPlan_Response) => {
-          if (res.errorCode == 0) {
-            this.clearPlan();
-            alert("儲存成功!");
-          } else {
-            alert("儲存失敗!");
+        {
+          next: (res: API_StoreTravelPlan_Response) => {
+            if (res.errorCode == 0) {
+              this.clearPlan();
+              alert("儲存成功!");
+            } else {
+              alert("儲存失敗!");
+            }
+            this.isLoading = false;
+          },
+          error: (error) => {
+            alert("發生錯誤!");
+            this.isLoading = false;
+          },
+          complete: () => {
           }
-          this.isLoading = false;
-        },
-        (err) => {
-          alert("發生錯誤!");
-          this.isLoading = false;
         }
       );
     } else {
@@ -222,5 +241,20 @@ export class TourPlanComponent implements OnInit {
     this.exportPlanDoc = "";
     this.isExportPlan = false;
   }
+
+  checkedPlan: PlaceResult[] = []
+  selectPlan(item: PlaceResult) {
+    if (this.checkedPlan.length >= 6) {
+      alert("超出六個選項限制!")
+    }
+
+    let index = this.checkedPlan.map(x => x.place_id).indexOf(item.place_id)
+    if (index == -1) {
+      this.checkedPlan.push(item);
+    } else {
+      alert("已有此選項")
+    }
+  }
+
 }
 

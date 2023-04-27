@@ -1,9 +1,9 @@
 import { ApiCallService } from '../../service/api-call.service';
 import { API_Base } from "./API_Base";
-export class API_GetTravelPlan extends API_Base {
-  protected url: string = "get-mem-plan";
+export class API_GetAllCommentTravelPlan extends API_Base {
+  protected url: string = "get-all-comment-plan";
 
-  response: API_GetTravelPlan_Response = {
+  response: API_GetAllCommentTravelPlan_Response = {
     errorCode: 0,
     errorMsg: "",
     result: {
@@ -27,32 +27,30 @@ export class API_GetTravelPlan extends API_Base {
 }
 
 type RequestData = {
-  idToken: string;
+  pid: number;
   pg: number;
 }
 
-export type API_GetTravelPlan_Response = {
+export type API_GetAllCommentTravelPlan_Response = {
   errorCode: number;
   errorMsg: string;
-  result: API_GetTravelPlan_Result;
-
+  result: API_GetAllComment_Result;
 }
 
-export type API_GetTravelPlan_Result = {
-  List: API_GetTravelPlan_List[];
+export type API_GetAllComment_Result = {
+  List: API_GetAllComment_List[];
   pg: Pg;
 }
 
-export type API_GetTravelPlan_List = {
+export type API_GetAllComment_List = {
   id: number;
-  acc: string;
-  context: string;
+  pid: string;
+  comment: string;
+  stars: string;
+  comment_acc: string;
+  comment_email: string;
   created_at: string;
-  email: string;
-  isOp: number;
-  title: string;
   updated_at: string;
-  stars: number;
 }
 
 export type Pg = {
