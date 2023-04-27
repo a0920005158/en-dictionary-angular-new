@@ -254,9 +254,10 @@ export class TourPlanComponent implements OnInit {
         alert("已有此選項")
       }
     }
-
-
   }
 
+  deleteCheckedPlan(index: number) {
+    this.checkedPlan.splice(index, 1);
+  }
 }
 

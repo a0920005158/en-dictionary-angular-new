@@ -87,7 +87,6 @@
             <div class="loading-overlay" [hidden]="!isLoading">
                 <div class="loading-spinner"></div>
             </div>
-
             <div class="content-center">
                 <div class="form-row" *ngFor="let item of this.searchCityState;index as ii">
                     <ng-container *ngIf="item.plan=='';else planed">
@@ -135,8 +134,9 @@
                             <div class="form-group col-md-5">選擇{{item.searchPos}}美食</div> -->
 
                             <div class="form-group col-md-10">
-                                <span *ngFor="let item of checkedPlan" class="badge badge-primary">
+                                <span *ngFor="let item of checkedPlan;index as chik;" class="badge badge-primary">
                                     {{item.name}}
+                                    <a (click)="deleteCheckedPlan(chik)" class="close" style="cursor: pointer;">×</a>
                                 </span>
                             </div>
 
