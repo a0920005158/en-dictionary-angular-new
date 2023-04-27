@@ -245,15 +245,17 @@ export class TourPlanComponent implements OnInit {
   checkedPlan: PlaceResult[] = []
   selectPlan(item: PlaceResult) {
     if (this.checkedPlan.length >= 6) {
-      alert("超出六個選項限制!")
+      alert("超出九個選項限制!")
+    } else {
+      let index = this.checkedPlan.map(x => x.place_id).indexOf(item.place_id)
+      if (index == -1) {
+        this.checkedPlan.push(item);
+      } else {
+        alert("已有此選項")
+      }
     }
 
-    let index = this.checkedPlan.map(x => x.place_id).indexOf(item.place_id)
-    if (index == -1) {
-      this.checkedPlan.push(item);
-    } else {
-      alert("已有此選項")
-    }
+
   }
 
 }
