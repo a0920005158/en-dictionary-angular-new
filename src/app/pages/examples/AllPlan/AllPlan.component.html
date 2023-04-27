@@ -76,7 +76,8 @@
                         <td>{{item.acc}}</td>
                         <td>{{item.updated_at}}</td>
                         <td>
-                          <rating [(ngModel)]="item.stars" [max]="5" [readonly]="true" [titles]="['one','two','three','four']"></rating>
+                          <rating [(ngModel)]="item.stars" [max]="5" [readonly]="true"
+                            [titles]="['one','two','three','four']"></rating>
                         </td>
                         <!-- <td class="td-actions text-right">
                           <button *ngIf="!item.isOp" (click)="releasePlan(item.id)" type="button" rel="tooltip"
@@ -172,11 +173,13 @@
         </div>
 
         <div class="text-left text-muted mb-4 mt-3">
-          <div style="border-bottom: solid;" *ngFor="let ci of showPlanComment.List">
-            <span> {{ci.comment_acc}}:&nbsp;{{ci.comment}}</span>&nbsp;&nbsp;&nbsp;
-            <rating [(ngModel)]="ci.stars" [max]="5" [readonly]="true" [titles]="['one','two','three','four']">
-            </rating>
-          </div>
+          <ng-container *ngFor="let ci of showPlanComment.List">
+            <div style="border-bottom: solid;" *ngIf="ci.comment_email!=LoginService.user.email">
+              <span> {{ci.comment_acc}}:&nbsp;{{ci.comment}}</span>&nbsp;&nbsp;&nbsp;
+              <rating [(ngModel)]="ci.stars" [max]="5" [readonly]="true" [titles]="['one','two','three','four']">
+              </rating>
+            </div>
+          </ng-container>
 
           <nav aria-label="Page navigation example" *ngIf="showPlanComment.pg.amount>0">
             <pagination [(ngModel)]="showPlanComment.pg.current" [totalItems]="showPlanComment.pg.pagesize"
