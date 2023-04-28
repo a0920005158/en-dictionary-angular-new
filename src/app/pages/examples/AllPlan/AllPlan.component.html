@@ -32,7 +32,7 @@
     </div>
   </div>
 </nav>
-<div class="wrapper">
+<div class="wrapper" style="overflow: hidden;">
   <div class="main" style="min-height: 100vh;">
     <div class="page-header-image"></div>
     <div class="content">
@@ -62,16 +62,17 @@
                         <th>分享會員</th>
                         <th>發布時間</th>
                         <th>星數</th>
-                        <!-- <th class="text-right">操作</th> -->
                       </tr>
                     </thead>
                     <tbody>
                       <tr *ngFor="let item of myPlan.List; let i=index">
                         <td>
-                          <button class="btn btn-success" data-target="#myModal2"
-                            (click)="showPlanIndex=i;getComment();myModal2.show()">
-                            {{item.title}}
+                          <button type="button" rel="tooltip" data-target="#myModal2"
+                            (click)="showPlanIndex=i;getComment();myModal2.show()"
+                            class="btn btn-info btn-sm btn-icon">
+                            <i class="tim-icons icon-tap-02"></i>
                           </button>
+                          {{item.title}}
                         </td>
                         <td>{{item.acc}}</td>
                         <td>{{item.updated_at}}</td>
@@ -79,22 +80,6 @@
                           <rating [(ngModel)]="item.stars" [max]="5" [readonly]="true"
                             [titles]="['one','two','three','four']"></rating>
                         </td>
-                        <!-- <td class="td-actions text-right">
-                          <button *ngIf="!item.isOp" (click)="releasePlan(item.id)" type="button" rel="tooltip"
-                            class="btn btn-primary">發布
-                            <i class="tim-icons icon-send"></i>
-                          </button>
-
-                          <button *ngIf="item.isOp" (click)="releasePlan(item.id)" type="button" rel="tooltip"
-                            class="btn btn-primary">取消發布
-                            <i class="tim-icons icon-send"></i>
-                          </button>
-
-                          <button (click)="deletePlan(item.id)" type="button" rel="tooltip"
-                            class="btn btn-danger btn-icon">
-                            <i class="tim-icons icon-simple-remove"></i>
-                          </button>
-                        </td> -->
                       </tr>
                       <tr>
                         <td colspan="4">

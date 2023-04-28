@@ -167,27 +167,29 @@ export class MyPlanComponent implements OnInit, OnDestroy {
 
   showPlanIndex: number = 0
 
-  releasePlan(pid: number) {
-    this.isLoading = true;
-    this.placesService.releasePlan(this.LoginService.user.idToken, pid).subscribe(
-      {
-        next: (res: API_GetTravelPlan_Response) => {
-          if (res.errorCode == 0) {
-            let index = this.myPlan.List.map(x => x.id).indexOf(pid);
-            this.myPlan.List[index].isOp = this.myPlan.List[index].isOp ? 0 : 1;
-          } else {
+  releasePlan(pid: number, isOp: number) {
+    if (confirm("你是否確定"+(isOp?"取消":"")+"分享您的旅遊計畫?")) {
+      this.isLoading = true;
+      this.placesService.releasePlan(this.LoginService.user.idToken, pid).subscribe(
+        {
+          next: (res: API_GetTravelPlan_Response) => {
+            if (res.errorCode == 0) {
+              let index = this.myPlan.List.map(x => x.id).indexOf(pid);
+              this.myPlan.List[index].isOp = this.myPlan.List[index].isOp ? 0 : 1;
+            } else {
+              alert("發生錯誤!");
+            }
+            this.isLoading = false;
+          },
+          error: (error) => {
             alert("發生錯誤!");
+            this.isLoading = false;
+          },
+          complete: () => {
           }
-          this.isLoading = false;
-        },
-        error: (error) => {
-          alert("發生錯誤!");
-          this.isLoading = false;
-        },
-        complete: () => {
         }
-      }
-    );
+      );
+    }
   }
 
   isLoading: boolean = false;
