@@ -87,7 +87,12 @@
             <div class="loading-overlay" [hidden]="!isLoading">
                 <div class="loading-spinner"></div>
             </div>
+
             <div class="content-center">
+                <div class="col-md-10">
+                    <h2>隨機、客製化產生您專屬的旅遊計畫</h2>
+                    <h5>跳脫舒適圈來一場未知的冒險</h5>
+                </div>
                 <div class="form-row" *ngFor="let item of this.searchCityState;index as ii">
                     <ng-container *ngIf="item.plan=='';else planed">
                         <div class="form-group col-md-5">
